@@ -1,0 +1,160 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #f0f0f0, #f0f0f0);
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 16px; /* base para rem */
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: hsl(238, 82%, 15%);
+  padding: 0.625rem 1.25rem; /* 10px 20px */
+  height: 4.375rem;           /* 70px */
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+img {
+  max-width: 5.625rem; /* 90px */
+  height: auto;
+}
+
+.menuLateral {
+  background-color: hsl(238, 82%, 15%);
+  position: fixed;
+  top: 4.375rem; /* 70px */
+  left: 0;
+  height: calc(100vh - 4.375rem); /* altura restante */
+  z-index: 900;
+}
+
+.hover-bg-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+a.text-light {
+  color: #d1cece;
+}
+
+a.text-light:hover {
+  color: #fff;
+}
+
+.menuHeader {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 0.3125rem; /* 5px */
+}
+
+.background {
+  background-color: hsl(238, 82%, 15%);
+}
+
+.submenu a:hover {
+  background: #f0f0f0;
+}
+
+.titulo-descricao {
+  width: 100%;
+  max-width: 45rem;        /* 720px */
+  margin-left: 16.875rem;  /* 270px */
+  margin-top: 5.625rem;    /* 90px */
+  margin-bottom: 0.9375rem;/* 15px */
+  padding: 0;
+}
+
+.titulo-descricao h4 {
+  font-size: 2rem;
+  margin-bottom: 0.3125rem; /* 5px */
+}
+
+.titulo-descricao small {
+  font-size: 0.875rem; 
+  color: #555;
+}
+
+.container-fluid {
+  position: relative;
+  top: 1.25rem;             /* 20px */
+  margin-left: 16.875rem;   /* 270px */
+  padding: 1.25rem;         /* 20px */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  z-index: 1;
+  overflow-y: auto;
+}
+
+/* Row interna */
+.row.g-4 {
+  margin-top: 0;
+}
+
+/* Colunas do formulário e resumo */
+.col-lg-8, .col-lg-4 {
+  padding-top: 0;
+}
+
+/* Formulário */
+.col-lg-8 form {
+  background-color: #fff;
+  padding: 1.25rem;           /* 20px */
+  border-radius: 0.5rem;      /* 8px */
+  box-shadow: 0 0.125rem 0.375rem rgba(0,0,0,0.1); /* 2px 6px */
+  max-width: 100%;
+  margin-top: 0;
+}
+
+/* Campos do formulário */
+.form-label {
+  font-weight: 500;
+}
+
+.form-control, .form-select {
+  margin-bottom: 0.9375rem; /* 15px */
+}
+
+/* Seção de anexos */
+form .mb-4.p-4 {
+  background-color: #f8f9fa;
+  border: 0.0625rem solid #ddd; /* 1px */
+}
+
+/* Botão enviar */
+form button[type="submit"] {
+  margin-top: 0.625rem; /* 10px */
+}
+
+/* Resumo */
+.col-lg-4 > .bg-white {
+  padding: 1.25rem; /* 20px */
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 0.125rem 0.375rem rgba(0,0,0,0.1);
+  background-color: #fff;
+  margin-top: 0;
+}
+
+.col-lg-4 > .bg-light.border {
+  margin-top: 0.625rem; /* 10px */
+  padding: 0.9375rem;   /* 15px */
+  border-radius: 0.5rem; /* 8px */
+  background-color: #f8f9fa;
+}
+
+/* Ajuste da coluna da direita (Resumo) */
+.col-lg-4 {
+  width: 14.375rem;                 /* 230px */
+  max-height: calc(100vh - 5rem);   /* 80px -> 5rem */
+  overflow-y: auto;
+  padding-left: 0;
+  flex: 0 0 auto;
+}

@@ -2,30 +2,33 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #f0f0f0, #f0f0f0); /* ou tua cor sólida */
-  z-index: 0; 
+  background: linear-gradient(135deg, #f0f0f0, #f0f0f0);
+  z-index: 0;
   position: relative;
+  font-size: 16px; /* base para rem */
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
-
 
 header {
   display: flex;
-  justify-content: space-between; /* logo à esquerda, menu à direita */
-  align-items: center; /* centraliza verticalmente dentro do header */
+  justify-content: space-between;
+  align-items: center;
   background-color: hsl(238, 82%, 15%);
-  padding: 10px 20px;
-  height: 70px; /* define altura fixa pro header */
+  padding: 0.625rem 1.25rem; /* 10px 20px */
+  height: 4.375rem; /* 70px */
 }
-.submenu a:hover { background: #f0f0f0; }
-/* PARA A IMAGEM  */
-img{
-    max-width: 90px;
-    height: auto;
-    
+
+.submenu a:hover {
+  background: #f0f0f0;
 }
-/* PARA O MENU LATERAL  */
-.menuLateral{
-  background-color:  hsl(238, 82%, 15%);
+
+img {
+  max-width: 5.625rem; /* 90px */
+  height: auto;
+}
+
+.menuLateral {
+  background-color: hsl(238, 82%, 15%);
 }
 
 .hover-bg-light:hover {
@@ -39,92 +42,92 @@ a.text-light {
 a.text-light:hover {
   color: #fff;
 }
-/* PARA O MENU SUSPENSO DROPDOWN */
+
 .menuHeader {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  margin-top: 5px; /* ajusta pra descer ou subir um pouco */
+  margin-top: 0.3125rem; /* 5px */
 }
-/* PARA A MSG DE BOAS VINDAS  */
+
+/* Mensagem de Boas-Vindas */
 .MensagemEntrada {
-  position: absolute; /* faz ele sair do fluxo normal */
-  top: 150px; /* exatamente abaixo do header que tem 70px de altura */
-  left: 270px; /* deixa ele ao lado do menu lateral */
-  padding: 0 20px;
-  font-size: large  ;
+  position: absolute;
+  top: 9.375rem;  /* 150px */
+  left: 16.875rem; /* 270px */
+  padding: 0 1.25rem; /* 20px */
+  font-size: 1.125rem; /* large ≈ 18px */
 }
-/* PRIMEIRO CARD  */
+
+/* Card 1 */
 .cardContainer1 {
   position: absolute;
-  top: 290px; /* abaixo da MensagemEntrada */
-  left: 300px; /* ao lado do menu lateral */
+  top: 18.125rem;  /* 290px */
+  left: 18.75rem;  /* 300px */
 }
 
 .card1 {
-  width: 300px;
-  padding: 20px;
-  font-size: large;
+  width: 18.75rem; /* 300px */
+  padding: 1.25rem; /* 20px */
+  font-size: 1.125rem; /* large */
   background-color: hsl(240, 6%, 88%);
   color: hsl(238, 82%, 15%);
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-radius: 0.75rem; /* 12px */
+  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.2); /* 4px 8px */
 }
 
 /* Card 2 */
 .cardContainer2 {
   position: absolute;
-  top: 290px; /* mesma altura inicial */
-  left: 620px; /* desloca para a direita */
+  top: 18.125rem; /* 290px */
+  left: 38.75rem; /* 620px */
 }
 
 .card2 {
-  width: 300px;
-  padding: 20px;
-  font-size: large;
+  width: 18.75rem; /* 300px */
+  padding: 1.25rem;
+  font-size: 1.125rem;
   background-color: hsl(240, 6%, 88%);
   color: #59570c;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.2);
 }
 
 /* Card 3 */
 .cardContainer3 {
   position: absolute;
-  top: 290px;
-  left: 940px; /* mais à direita */
+  top: 18.125rem; /* 290px */
+  left: 58.75rem; /* 940px */
 }
 
 .card3 {
-  width: 300px;
-  padding: 20px;
-  font-size: large;
+  width: 18.75rem; /* 300px */
+  padding: 1.25rem;
+  font-size: 1.125rem;
   background-color: hsl(240, 6%, 88%);
   color: #771313;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.2);
 }
 
 /* Estilo compartilhado para os títulos */
 .card-title {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* espaço entre o ícone e o texto */
-    font-size: 1.4rem;
-    font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem; /* 10px */
+  font-size: 1.4rem;
+  font-weight: 500;
 }
 
 /* Número do Card */
 .card-text {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin: 10px 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0.625rem 0; /* 10px */
 }
 
 /* Pequena descrição */
 .card p {
-    font-size: 1rem;
-    margin: 0;
+  font-size: 1rem;
+  margin: 0;
 }
-
-
