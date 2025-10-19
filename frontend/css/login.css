@@ -2,13 +2,12 @@ body{
     background-color: hsl(238, 82%, 15%);
     margin: 0;
     padding: 0;
-
 }
 header{
     text-align: center;
     color: #f0f0f0;
     font-family: sans-serif;
-  
+
 }
 img{
     max-width: 200px;
