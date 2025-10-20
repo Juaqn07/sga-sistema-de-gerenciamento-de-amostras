@@ -50,7 +50,5 @@ input[type="submit"] {
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 10px;
     cursor: pointer;
-    margin-top: 15px;
 }
