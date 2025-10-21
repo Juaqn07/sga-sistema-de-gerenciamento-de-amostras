@@ -124,10 +124,11 @@ a.text-light:hover {
 }
 
 /* Seção de anexos */
-form .mb-4.p-4 {
+.anexos {
   background-color: #f8f9fa;
   border: 0.0625rem solid #ddd; /* 1px */
 }
+
 
 /* Botão enviar */
 form button[type="submit"] {
@@ -157,4 +158,15 @@ form button[type="submit"] {
   overflow-y: auto;
   padding-left: 0;
   flex: 0 0 auto;
+}
+button[type="submit"] {
+border: none;
+padding: 0.5rem 0.75rem;
+font-size: 1rem;
+width: 100%; 
+box-sizing: border-box;
+transition: background-color 0.2s ease-in-out;
+}
+button[type="submit"]:hover {
+  transform: scale(1.1);
 }

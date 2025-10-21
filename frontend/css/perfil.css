@@ -4,7 +4,7 @@ html, body {
   padding: 0;
   background: linear-gradient(135deg, #f0f0f0, #f0f0f0);
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  font-size: 16px; /* base para rem */
+  font-size: 16px; 
 }
 
 header {
@@ -12,8 +12,8 @@ header {
   justify-content: space-between;
   align-items: center;
   background-color: hsl(238, 82%, 15%);
-  padding: 0.625rem 1.25rem; /* 10px 20px */
-  height: 4.375rem;           /* 70px */
+  padding: 0.625rem 1.25rem; 
+  height: 4.375rem;         
   z-index: 1000;
   position: fixed;
   top: 0;
@@ -22,16 +22,16 @@ header {
 }
 
 img {
-  max-width: 5.625rem; /* 90px */
+  max-width: 5.625rem;
   height: auto;
 }
 
 .menuLateral {
   background-color: hsl(238, 82%, 15%);
   position: fixed;
-  top: 4.375rem; /* 70px */
+  top: 4.375rem; 
   left: 0;
-  height: calc(100vh - 4.375rem); /* altura restante */
+  height: calc(100vh - 4.375rem); 
   z-index: 900;
 }
 
@@ -51,7 +51,7 @@ a.text-light:hover {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  margin-top: 0.3125rem; /* 5px */
+  margin-top: 0.3125rem; 
 }
 
 .background {
@@ -60,4 +60,66 @@ a.text-light:hover {
 
 .submenu a:hover {
   background: #f0f0f0;
+}
+/* Área do formulário */
+.container {
+  margin-left: 270px;
+  padding-top: 102px;
+  margin-bottom: 50px;
+}
+h3{
+  color: hsl(238, 82%, 15%);
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.card {
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+}
+
+.card img.rounded-circle {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid hsl(238, 82%, 15%);
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+}
+
+.col-md-4 {
+  flex: 0 0 30%;
+}
+
+.col-md-8 {
+  flex: 0 0 65%;
+}
+
+form .form-label {
+  font-weight: 600;
+}
+
+form .form-control {
+  border-radius: 0.25rem;
+}
+
+form .d-flex.gap-2 {
+  margin-top: 1rem;
+}
+
+form .btn {
+  min-width: 100px;
+}
+
+.card h5 {
+  margin-bottom: 0.25rem;
+}
+
+.card p {
+  margin-bottom: 0.25rem;
+  color: #555;
 }
