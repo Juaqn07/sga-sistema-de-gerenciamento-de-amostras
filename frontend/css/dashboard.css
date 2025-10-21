@@ -1,12 +1,14 @@
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
   background: linear-gradient(135deg, #f0f0f0, #f0f0f0);
   z-index: 0;
   position: relative;
-  font-size: 16px; /* base para rem */
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
 header {
@@ -14,8 +16,13 @@ header {
   justify-content: space-between;
   align-items: center;
   background-color: hsl(238, 82%, 15%);
-  padding: 0.625rem 1.25rem; /* 10px 20px */
-  height: 4.375rem; /* 70px */
+  padding: 0.625rem 1.25rem;
+  height: 4.375rem;
+  z-index: 1000;
+  position: fixed; /* Adicionado para fixar o header */
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 .submenu a:hover {
@@ -23,12 +30,17 @@ header {
 }
 
 img {
-  max-width: 5.625rem; /* 90px */
+  max-width: 5.625rem;
   height: auto;
 }
 
 .menuLateral {
   background-color: hsl(238, 82%, 15%);
+  position: fixed; /* Adicionado para fixar o menu */
+  top: 4.375rem; /* Abaixo do header */
+  left: 0;
+  height: calc(100vh - 4.375rem); /* Altura total - header */
+  z-index: 900;
 }
 
 .hover-bg-light:hover {
@@ -47,87 +59,67 @@ a.text-light:hover {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  margin-top: 0.3125rem; /* 5px */
+  margin-top: 0.3125rem;
 }
 
-/* Mensagem de Boas-Vindas */
+/* ===== ÁREA DE CONTEÚDO (Substitui o position: absolute) ===== */
+.content-area {
+  margin-top: 4.375rem;  /* Altura do header */
+  margin-left: 250px;   /* Largura do menu lateral */
+  padding: 2rem;        /* Espaçamento interno */
+  width: calc(100% - 250px); /* Ocupa o espaço restante */
+  box-sizing: border-box;
+}
+
+/* Mensagem de Boas-Vindas (Removido position: absolute) */
 .MensagemEntrada {
-  position: absolute;
-  top: 9.375rem;  /* 150px */
-  left: 16.875rem; /* 270px */
-  padding: 0 1.25rem; /* 20px */
-  font-size: 1.125rem; /* large ≈ 18px */
+  padding: 0;
+  font-size: 1.125rem;
+  margin-bottom: 1.5rem; /* Adiciona espaço abaixo da mensagem */
 }
 
-/* Card 1 */
-.cardContainer1 {
-  position: absolute;
-  top: 18.125rem;  /* 290px */
-  left: 18.75rem;  /* 300px */
+/* Estilo base para TODOS os cards (incluindo o novo do gráfico) */
+.dashboard-card {
+  width: 100%; /* Ocupa a coluna do Bootstrap */
+  padding: 1.25rem;
+  font-size: 1.125rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); /* Sombra da imagem */
+  background-color: hsl(240, 6%, 88%); /* Cor de fundo original */
 }
 
+/* Card do Gráfico (fundo branco) */
+.chart-card {
+  background-color: #ffffff;
+}
+
+/* Cores originais dos cards */
 .card1 {
-  width: 18.75rem; /* 300px */
-  padding: 1.25rem; /* 20px */
-  font-size: 1.125rem; /* large */
-  background-color: hsl(240, 6%, 88%);
   color: hsl(238, 82%, 15%);
-  border-radius: 0.75rem; /* 12px */
-  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.2); /* 4px 8px */
 }
-
-/* Card 2 */
-.cardContainer2 {
-  position: absolute;
-  top: 18.125rem; /* 290px */
-  left: 38.75rem; /* 620px */
-}
-
 .card2 {
-  width: 18.75rem; /* 300px */
-  padding: 1.25rem;
-  font-size: 1.125rem;
-  background-color: hsl(240, 6%, 88%);
   color: #59570c;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.2);
 }
-
-/* Card 3 */
-.cardContainer3 {
-  position: absolute;
-  top: 18.125rem; /* 290px */
-  left: 58.75rem; /* 940px */
-}
-
 .card3 {
-  width: 18.75rem; /* 300px */
-  padding: 1.25rem;
-  font-size: 1.125rem;
-  background-color: hsl(240, 6%, 88%);
   color: #771313;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.2);
 }
 
-/* Estilo compartilhado para os títulos */
+/* Estilos originais dos textos dos cards (Intactos) */
 .card-title {
   display: flex;
   align-items: center;
-  gap: 0.625rem; /* 10px */
+  gap: 0.625rem;
   font-size: 1.4rem;
   font-weight: 500;
 }
 
-/* Número do Card */
 .card-text {
   font-size: 2.5rem;
   font-weight: bold;
-  margin: 0.625rem 0; /* 10px */
+  margin: 0.625rem 0;
 }
 
-/* Pequena descrição */
-.card p {
+.dashboard-card p {
   font-size: 1rem;
   margin: 0;
 }
