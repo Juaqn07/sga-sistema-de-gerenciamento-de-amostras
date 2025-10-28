@@ -1,76 +1,11 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(135deg, #f0f0f0, #f0f0f0);
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  font-size: 16px; 
-}
+/* ================================================= */
+/* ESTILOS ESPECÍFICOS: Cadastrar Usuário            */
+/* ================================================= */
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: hsl(238, 82%, 15%);
-  padding: 0.625rem 1.25rem; 
-  height: 4.375rem;         
-  z-index: 1000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-}
+/* (Todo o código de header, menu, body, .titulo-descricao (layout) e .cards-wrapper (layout) foi removido) */
 
-img {
-  max-width: 5.625rem;
-  height: auto;
-}
 
-.menuLateral {
-  background-color: hsl(238, 82%, 15%);
-  position: fixed;
-  top: 4.375rem; 
-  left: 0;
-  height: calc(100vh - 4.375rem); 
-  z-index: 900;
-}
-
-.hover-bg-light:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-a.text-light {
-  color: #d1cece;
-}
-
-a.text-light:hover {
-  color: #fff;
-}
-
-.menuHeader {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  margin-top: 0.3125rem; 
-}
-
-.background {
-  background-color: hsl(238, 82%, 15%);
-}
-
-.submenu a:hover {
-  background: #f0f0f0;
-}
-
-.titulo-descricao {
-  width: 100%;
-  max-width: 45rem;        
-  margin-left: 16.875rem;  
-  margin-top: 5.625rem;    
-  margin-bottom: 0.9375rem;
-  padding: 0;
-}
-
+/* Estilos de texto dentro do título */
 .titulo-descricao h4 {
   font-size: 2rem;
   margin-bottom: 0.3125rem; /* 5px */
@@ -80,14 +15,14 @@ a.text-light:hover {
   font-size: 0.875rem; 
   color: #555;
 }
-/* css para o formulário de cadastro de usuário */
 
+/* css para o formulário de cadastro de usuário */
 .formulario-cadastro {
   background-color: #fff;
   border-radius: 0.5rem; 
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-  margin-left: 17rem; 
-  margin-top: 6rem; 
+  /* margin-left: 17rem; (Removido, o .cards-wrapper cuida disso) */
+  /* margin-top: 6rem; (Removido, o .titulo-descricao cuida disso) */
   padding: 1.5rem;
   max-width: 40rem; 
   width: calc(100% - 18rem);
@@ -98,7 +33,7 @@ a.text-light:hover {
 }
 
 .formulario-cadastro h3 {
-  color: hsl(238, 82%, 15%);
+  color: var(--cor-principal); /* <-- Usando a variável global! */
   margin-bottom: 1rem;
   font-size: 1.4rem;
 }
@@ -129,14 +64,14 @@ transition: background-color 0.2s ease-in-out;
 .formulario-cadastro button[type="submit"]:hover {
   background-color: #218838;
 }
-/* CSS para o card de Usuários Cadastrados */
 
+/* CSS para o card de Usuários Cadastrados */
 .usuarios-cadastrados-card {
   background-color: #fff;
   border-radius: 0.5rem; /* 8px */
   box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1);
-  margin-left: 17rem; /* alinhado ao lado do menu lateral */
-  margin-top: 6rem; /* abaixo do header */
+  /* margin-left: 17rem; (Removido) */
+  /* margin-top: 6rem; (Removido) */
   padding: 1.5rem;
   max-width: 25rem; /* largura menor para caber ao lado do outro card */
   width: calc(100% - 18rem);
@@ -147,7 +82,7 @@ transition: background-color 0.2s ease-in-out;
 }
 
 .usuarios-cadastrados-card h3 {
-  color: hsl(238, 82%, 15%);
+  color: var(--cor-principal); /* <-- Usando a variável global! */
   margin-bottom: 1rem;
   font-size: 1.75rem;
 }
@@ -185,15 +120,8 @@ transition: background-color 0.2s ease-in-out;
 .usuarios-cadastrados-card button[type="button"]:hover {
   background-color: #c82333;
 }
-.cards-wrapper {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-left: 17rem; 
-  margin-top: 0rem;   
-}
 
-
+/* Ajustes de flexbox do .cards-wrapper (já que a margem foi movida para o layout.css) */
 .formulario-cadastro,
 .usuarios-cadastrados-card {
   flex: 1 1 auto; /* flexível, respeitando max-width */

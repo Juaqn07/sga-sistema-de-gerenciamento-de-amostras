@@ -1,77 +1,10 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(135deg, #f0f0f0, #f0f0f0);
-  z-index: 0;
-  position: relative;
-  font-size: 16px;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-}
+/* ================================================= */
+/* ESTILOS ESPECÍFICOS: Dashboard                    */
+/* ================================================= */
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: hsl(238, 82%, 15%);
-  padding: 0.625rem 1.25rem;
-  height: 4.375rem;
-  z-index: 1000;
-  position: fixed; /* Adicionado para fixar o header */
-  top: 0;
-  left: 0;
-  right: 0;
-}
+/* (Todo o código de header, menu e body foi removido) */
 
-.submenu a:hover {
-  background: #f0f0f0;
-}
-
-img {
-  max-width: 5.625rem;
-  height: auto;
-}
-
-.menuLateral {
-  background-color: hsl(238, 82%, 15%);
-  position: fixed; /* Adicionado para fixar o menu */
-  top: 4.375rem; /* Abaixo do header */
-  left: 0;
-  height: calc(100vh - 4.375rem); /* Altura total - header */
-  z-index: 900;
-}
-
-.hover-bg-light:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-a.text-light {
-  color: #d1cece;
-}
-
-a.text-light:hover {
-  color: #fff;
-}
-
-.menuHeader {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  margin-top: 0.3125rem;
-}
-
-/* ===== ÁREA DE CONTEÚDO (Substitui o position: absolute) ===== */
-.content-area {
-  margin-top: 4.375rem;  /* Altura do header */
-  margin-left: 250px;   /* Largura do menu lateral */
-  padding: 2rem;        /* Espaçamento interno */
-  width: calc(100% - 250px); /* Ocupa o espaço restante */
-  box-sizing: border-box;
-}
-
-/* Mensagem de Boas-Vindas (Removido position: absolute) */
+/* Mensagem de Boas-Vindas */
 .MensagemEntrada {
   padding: 0;
   font-size: 1.125rem;
@@ -95,7 +28,7 @@ a.text-light:hover {
 
 /* Cores originais dos cards */
 .card1 {
-  color: hsl(238, 82%, 15%);
+  color: var(--cor-principal); /* <-- Usando a variável global! */
 }
 .card2 {
   color: #59570c;

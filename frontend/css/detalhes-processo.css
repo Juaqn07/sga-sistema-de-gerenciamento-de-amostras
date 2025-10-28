@@ -1,0 +1,164 @@
+/* ================================================= */
+/* ESTILOS ESPECÍFICOS: Detalhes do Processo         */
+/* ================================================= */
+
+/* Wrapper principal que aplica o espaçamento do menu e header */
+.process-wrapper {
+  margin-left: var(--largura-menu);
+  padding: 2rem;
+  padding-top: calc(var(--altura-header) + 2rem);
+  width: calc(100% - var(--largura-menu));
+  box-sizing: border-box;
+}
+
+/* 1. Cabeçalho da Página (Voltar, Título, Badges) */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header .btn-back {
+  color: #6c757d;
+  text-decoration: none;
+  font-weight: 500;
+}
+.page-header .btn-back:hover {
+  color: #343a40;
+}
+
+.page-header h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* 2. Layout Colunas (Principal e Sidebar) */
+.process-layout-main {
+  /* Coluna da esquerda (col-lg-8) */
+}
+
+.process-layout-sidebar {
+  /* Coluna da direita (col-lg-4) */
+}
+
+/* 3. Cards Customizados */
+
+/* Card de Informações (Topo Esquerda) */
+.info-card-footer {
+  border-top: 1px solid #e9ecef;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+.info-card-footer .info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+/* Card de Detalhes (Sidebar) */
+.details-card .detail-item {
+  margin-bottom: 1rem;
+}
+.details-card .detail-item label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.details-card .detail-item p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+.details-card .detail-item .badge {
+  font-size: 0.9rem;
+  padding: 0.4em 0.8em;
+}
+
+/* Card de Ações (Sidebar) */
+.actions-card .btn {
+  /* Garante ícones alinhados à esquerda */
+  text-align: left;
+  padding-left: 1.25rem;
+}
+.actions-card .btn i {
+  margin-right: 0.75rem;
+  width: 1.25rem; /* Alinha o texto */
+}
+
+/* Card de Estatísticas (Sidebar) */
+.stats-card .stat-item {
+  font-size: 0.9rem;
+}
+.stats-card .stat-item .stat-value {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+
+/* 4. Timeline (Aba Histórico) */
+.process-timeline {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.5rem;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 2.5rem; /* Espaço para o ícone e linha */
+  padding-bottom: 2rem;
+}
+
+/* A linha vertical */
+.timeline-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 0.7rem; /* Centraliza no ícone */
+  top: 1.5rem;  /* Começa abaixo do ícone */
+  height: 100%;
+  border-left: 2px solid #e9ecef;
+}
+
+/* O ícone de círculo */
+.timeline-icon {
+  position: absolute;
+  left: 0;
+  top: 0.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
+  border-radius: 50%;
+  background-color: #e7f1ff;
+  color: var(--cor-principal);
+  font-size: 0.8rem;
+}
+
+.timeline-content {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+.timeline-content strong {
+  display: block;
+  font-weight: 600;
+  color: #343a40;
+}
+.timeline-content small {
+  display: block;
+  color: #6c757d;
+  margin-top: 0.125rem;
+}
+
+.timeline-note {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+  padding-left: 0.25rem;
+}

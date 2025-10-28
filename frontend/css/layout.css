@@ -1,0 +1,145 @@
+/* ================================================= */
+/* ARQUIVO BASE DE LAYOUT (NOVO)                     */
+/* Contém todos os estilos globais e compartilhados  */
+/* ================================================= */
+
+/* * 1. VARIÁVEIS GLOBAIS
+ * Para mudar o layout (cores, tamanhos) do site 
+ * inteiro, edite apenas aqui.
+ */
+:root {
+  --cor-principal: hsl(238, 82%, 15%);
+  --cor-fundo-pagina: #f0f0f0;
+  --cor-link-menu: #d1cece;
+  --cor-link-menu-hover: #fff;
+  --fundo-link-menu-hover: rgba(255, 255, 255, 0.1);
+  
+  --altura-header: 4.375rem; /* 70px */
+  --largura-menu: 250px;
+  --largura-menu-min: 180px;
+}
+
+/* * 2. ESTILOS GERAIS (HTML, BODY)
+ */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-fundo-pagina);
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 16px; 
+}
+
+/* * 3. HEADER (CABEÇALHO)
+ */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--cor-principal);
+  padding: 0.625rem 1.25rem; 
+  height: var(--altura-header);         
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+header img {
+  max-width: 5.625rem;
+  height: auto;
+}
+
+.menuHeader {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 0.3125rem; 
+}
+
+/* * 4. MENU LATERAL
+ */
+.menuLateral {
+  background-color: var(--cor-principal);
+  position: fixed;
+  top: var(--altura-header); 
+  left: 0;
+  height: calc(100vh - var(--altura-header)); 
+  width: var(--largura-menu);
+  min-width: var(--largura-menu-min);
+  z-index: 900;
+}
+
+a.text-light {
+  color: var(--cor-link-menu);
+}
+
+a.text-light:hover {
+  color: var(--cor-link-menu-hover);
+}
+
+.hover-bg-light:hover {
+  background-color: var(--fundo-link-menu-hover);
+}
+
+/* * 5. CLASSES DE LAYOUT DE CONTEÚDO
+ * (Regras que empurram o conteúdo para 
+ * depois do header e do menu)
+ */
+
+/* Usado em: dashboard.html */
+.content-area {
+  margin-top: var(--altura-header);  /* Pula o header */
+  margin-left: var(--largura-menu);  /* Pula o menu lateral */
+  padding: 2rem;
+  width: calc(100% - var(--largura-menu));
+  box-sizing: border-box;
+}
+
+/* Usado em: perfil.html */
+.container.my-5 {
+  margin-left: var(--largura-menu);
+  padding-top: calc(var(--altura-header) + 2rem); /* Pula o header (ajustado) */
+  margin-bottom: 50px;
+  width: calc(100% - var(--largura-menu) - 2rem); /* Garante que não transborde */
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+}
+
+/* Usado em: criar-processo.html, processos-do-setor.html */
+.titulo-descricao {
+  width: 100%;
+  max-width: 45rem;
+  margin-left: calc(var(--largura-menu) + 1.875rem); /* 270px */
+  margin-top: calc(var(--altura-header) + 1.25rem);  /* 90px */
+  margin-bottom: 0.9375rem;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Usado em: criar-processo.html, processos-do-setor.html */
+.container-fluid {
+  position: relative;
+  /* top: 1.25rem; (removido para simplificar) */
+  margin-top: 1.25rem;
+  margin-left: calc(var(--largura-menu) + 1.875rem); /* 270px */
+  padding: 1.25rem;
+  box-sizing: border-box;
+  z-index: 1;
+  overflow-y: auto;
+  /* Ajuste para ocupar o espaço restante */
+  width: calc(100% - var(--largura-menu) - 1.875rem);
+}
+
+/* Usado em: cadastrar-usuario.html */
+.cards-wrapper {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-left: calc(var(--largura-menu) + 2rem); /* 272px */
+  margin-top: 1rem;   
+  width: calc(100% - var(--largura-menu) - 2rem);
+  box-sizing: border-box;
+}
