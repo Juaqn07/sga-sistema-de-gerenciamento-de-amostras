@@ -32,8 +32,8 @@
             Gestor
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="./perfil.html">Perfil</a></li>
-            <li><a class="dropdown-item" href="./index.html">Sair</a></li>
+            <li><a class="dropdown-item" href="./perfil.php">Perfil</a></li>
+            <li><a class="dropdown-item" href="./index.php">Sair</a></li>
           </ul>
         </div>
       </div>
@@ -46,25 +46,25 @@
         style="width: 250px; min-width: 180px; height: 100vh"
       >
         <a
-          href="./dashboard.html"
+          href="./dashboard.php"
           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
         >
           <i class="bi bi-house me-2"></i> Dashboard
         </a>
         <a
-          href="./criar-processo.html"
+          href="./criar-processo.php"
           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
         >
           <i class="bi bi-file-earmark-plus me-2"></i> Criar Processo
         </a>
         <a
-          href="./processos-do-setor.html"
+          href="./processos-do-setor.php"
           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
         >
           <i class="bi bi-folder2-open me-2"></i> Processos Do Setor
         </a>
         <a
-          href="./cadastrar-usuario.html"
+          href="./cadastrar-usuario.php"
           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
         >
           <i class="bi bi-person-plus me-2"></i> Cadastrar Usuário

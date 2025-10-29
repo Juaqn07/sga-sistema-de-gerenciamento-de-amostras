@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <header>
+      <img src="../img/logo.png" alt="Logo - SGA" />
+      <div class="menuHeader">
+        <div class="dropdown">
+          <a
+            class="btn-outline-light btn btn-secondary dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Gestor
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="./perfil.php">Perfil</a></li>
+            <li><a class="dropdown-item" href="./index.php">Sair</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div
+        class="d-flex flex-column menuLateral text-light p-3"
+        style="width: 250px; min-width: 180px; height: 100vh"
+      >
+        <a
+          href="./dashboard.php"
+          class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
+        >
+          <i class="bi bi-house me-2"></i> Dashboard
+        </a>
+        <a
+          href="./criar-processo.php"
+          class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
+        >
+          <i class="bi bi-file-earmark-plus me-2"></i> Criar Processo
+        </a>
+        <a
+          href="./processos-do-setor.php"
+          class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
+        >
+          <i class="bi bi-folder2-open me-2"></i> Processos Do Setor
+        </a>
+        <a
+          href="./cadastrar-usuario.php"
+          class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
+        >
+          <i class="bi bi-person-plus me-2"></i> Cadastrar Usuário
+        </a>
+      </div>
+    </section>
+
+    <main class="content-area">
+      <div class="MensagemEntrada">
+        <h1>Olá, Administrador</h1>
+        <p>Resumo das suas atividades</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+          <div class="dashboard-card card1 h-100">
+            <div class="card-body">
+              <h5 class="card-title bi bi-file-text">Processos do Setor</h5>
+              <h1 class="card-text">1</h1>
+              <p>Em processo</p>
+              <a href="./processos-do-setor.html" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="dashboard-card card2 h-100">
+            <div class="card-body">
+              <h5 class="card-title bi bi-clock-history">
+                Processos pendentes
+              </h5>
+              <h1 class="card-text">2</h1>
+              <p>Aguardando</p>
+              <a href="./processos-do-setor.html" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="dashboard-card card3 h-100">
+            <div class="card-body">
+              <h5 class="card-title bi bi-exclamation-diamond">
+                Processos atrasados
+              </h5>
+              <h1 class="card-text">3</h1>
+              <p>Em atraso</p>
+              <a href="./processos-do-setor.html" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="dashboard-card chart-card">
+            <div class="card-body">
+              <h5 class="h4 mb-0">Processos por Semana</h5>
+              <p class="text-muted">Últimas 6 semanas de atividade</p>
+              <div>
+                <canvas id="weeklyProcessChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../js/dashboard-chart.js"></script>
+  </body>
+</html>

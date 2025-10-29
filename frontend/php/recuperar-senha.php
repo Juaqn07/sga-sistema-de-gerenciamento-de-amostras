@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SGA - Recuperar Senha</title>
+    <link rel="stylesheet" href="../css/recuperar-senha.css" />
+    <!-- Parece que esse css não nos permite usar as cores padrão do sistema.
+        Vamos rever a implementação do Bootstrap.
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    />
+    -->
+    <!-- JS do Bootstrap (necessário pra componentes tipo modal, dropdown etc) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <img src="../img/logo.png" alt="Logo - SGA" />
+      <h1>Sistema Gerenciamento de Amostras</h1>
+    </header>
+    <div>
+      <form action="./recuperar-senha.php">
+        <h1>Redefinir Senha</h1>
+        <p>Enviaremos um link seguro para seu e-mail cadastrado</p>
+
+        <label for="txtEmail">E-mail cadastrado:</label>
+        <input type="email" name="Email" id="txtEmail" />
+        <input type="submit" value="Enviar link de recuperação" />
+      </form>
+
+      <p>Lembrou da senha?</p>
+      <a href="./index.php">Login</a>
+    </div>
+  </body>
+</html>
