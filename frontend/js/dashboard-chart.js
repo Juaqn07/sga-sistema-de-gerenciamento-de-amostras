@@ -2,20 +2,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const labels = ["Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6"];
   const dataValues = [14, 18, 15, 22, 20, 17];
   const backgroundColors = [
-    "hsla(238, 93.00%, 27.80%, 0.87)", // Sem 1 (Laranja)
-    "hsla(238, 93.00%, 27.80%, 0.87)", // Sem 2 (Verde-água)
-    "hsla(238, 93.00%, 27.80%, 0.87)", // Sem 3 (Roxo)
-    "hsla(238, 93.00%, 27.80%, 0.87)",  // Sem 4 (Azul)
-    "hsla(238, 93.00%, 27.80%, 0.87)", // Sem 5 (Rosa)
-    "hsla(238, 93.00%, 27.80%, 0.87)", // Sem 6 (Lilás)
+    'hsla(238, 82%, 15%, 0.8)',
+    'hsla(238, 82%, 15%, 0.8)',
+    'hsla(238, 82%, 15%, 0.8)',
+    'hsla(238, 82%, 15%, 0.8)',
+
   ];
   const borderColors = [
-    "hsla(238, 93.00%, 27.80%, 0.87)",
-    "hsla(238, 93.00%, 27.80%, 0.87)",
-    "hsla(238, 93.00%, 27.80%, 0.87)",
-    "hsla(238, 93.00%, 27.80%, 0.87)",
-    "hsla(238, 93.00%, 27.80%, 0.87)",
-    "hsla(238, 93.00%, 27.80%, 0.87)",
+    "hsla(238, 93.00%, 27.80%, 0.60)",
+    "hsla(238, 93.00%, 27.80%, 0.60)",
+    "hsla(238, 93.00%, 27.80%, 0.60)",
+    "hsla(238, 93.00%, 27.80%, 0.60)",
+    "hsla(238, 93.00%, 27.80%, 0.60)",
+    "hsla(238, 93.00%, 27.80%, 0.60)",
   ];
 
   const ctx = document.getElementById("weeklyProcessChart").getContext("2d");

@@ -387,7 +387,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="modalAddComentarioLabel">
-              Adicionar Comentário
+              Relatar ocorrência
             </h1>
             <button
               type="button"
@@ -400,15 +400,25 @@
             <p id="modalComentarioInfo" class="text-muted small"></p>
             <div class="mb-3">
               <label for="modalComentarioTextarea" class="form-label"
-                >Comentário</label
+                >Ocorrência</label
               >
               <textarea
                 class="form-control"
                 id="modalComentarioTextarea"
                 rows="4"
-                placeholder="Digite seu comentário sobre o processo..."
+                placeholder="Digite sua ocorrência ou comentário..."
               ></textarea>
             </div>
+            <label class="form-check-label p-3 rounded" for="fluxoGestao">
+                <strong class="d-block"
+                  ><i class="bi bi-exclamation-triangle"></i> Encaminhar para
+                  Gestão</strong
+                >
+                <small class="text-muted"
+                  >Este processo Será enviado para análise de ocorrências pela
+                  gestão.</small
+                >
+            </label>
           </div>
           <div class="modal-footer">
             <button
@@ -423,7 +433,7 @@
               class="btn btn-success"
               style="background-color: #5cb85c; border-color: #4cae4c"
             >
-              <i class="bi bi-chat-square-text me-1"></i> Enviar Comentário
+              <i class="bi bi-chat-square-text me-1"></i> Enviar ocorrência
             </button>
           </div>
         </div>
