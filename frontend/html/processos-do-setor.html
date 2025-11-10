@@ -180,15 +180,6 @@
                   data-processo-id="PRC-2025-00123"
                   data-processo-titulo="Análise de Pré-forma - Lote A123"
                 ></i>
-                <i
-                  class="bi bi-send text-secondary"
-                  role="button"
-                  title="Encaminhar"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalEncaminharProcesso"
-                  data-processo-id="PRC-2025-00123"
-                  data-processo-titulo="Análise de Pré-forma - Lote A123"
-                ></i>
               </td>
             </tr>
 
@@ -255,15 +246,7 @@
                   data-processo-id="PRC-2025-00124"
                   data-processo-titulo="Teste de Garrafa Finalizada - Linha 02"
                 ></i>
-                <i
-                  class="bi bi-send text-secondary"
-                  role="button"
-                  title="Encaminhar"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalEncaminharProcesso"
-                  data-processo-id="PRC-2025-00124"
-                  data-processo-titulo="Teste de Garrafa Finalizada - Linha 02"
-                ></i>
+   
               </td>
             </tr>
           </tbody>
@@ -400,7 +383,7 @@
             <p id="modalComentarioInfo" class="text-muted small"></p>
             <div class="mb-3">
               <label for="modalComentarioTextarea" class="form-label"
-                >Ocorrência</label
+                ></label
               >
               <textarea
                 class="form-control"
@@ -439,87 +422,6 @@
         </div>
       </div>
     </div>
-
-    <div
-      class="modal fade modal-encaminhar"
-      id="modalEncaminharProcesso"
-      tabindex="-1"
-      aria-labelledby="modalEncaminharProcessoLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="modalEncaminharProcessoLabel">
-              Encaminhar Processo
-            </h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <p id="modalEncaminharInfo" class="text-muted small"></p>
-
-            <div class="form-check mb-2">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="encaminharOpcao"
-                id="fluxoPadrao"
-                value="padrao"
-                checked
-              />
-              <label class="form-check-label p-3 rounded" for="fluxoPadrao">
-                <strong class="d-block text-primary"
-                  ><i class="bi bi-arrow-right-short"></i> Fluxo padrão do
-                  sistema</strong
-                >
-                <small class="text-muted"
-                  >O processo será encaminhado automaticamente para a próxima
-                  etapa do fluxo.</small
-                >
-              </label>
-            </div>
-
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="encaminharOpcao"
-                id="fluxoGestao"
-                value="gestao"
-              />
-              <label class="form-check-label p-3 rounded" for="fluxoGestao">
-                <strong class="d-block"
-                  ><i class="bi bi-exclamation-triangle"></i> Encaminhar para
-                  Gestão</strong
-                >
-                <small class="text-muted"
-                  >Envia o processo para análise de ocorrências pela
-                  gestão.</small
-                >
-              </label>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
-            <button type="button" class="btn btn-success">
-              <i class="bi bi-check-circle me-1"></i> Confirmar Encaminhamento
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <script src="../js/processos-do-setor.js" defer></script>
   </body>
 </html>

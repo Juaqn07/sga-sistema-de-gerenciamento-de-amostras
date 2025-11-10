@@ -72,20 +72,3 @@
   border-radius: 6px;
 }
 
-/* ================================================= */
-/* ===== ESTILOS DO MODAL ====== */
-/* ================================================= */
-
-/* Estilo customizado para os botões de rádio do modal "Encaminhar" */
-.modal-encaminhar .form-check-label {
-  display: block;
-  border: 1px solid #dee2e6;
-  cursor: pointer;
-}
-.modal-encaminhar .form-check-label:hover {
-  background-color: #f8f9fa;
-}
-.modal-encaminhar .form-check-input:checked + .form-check-label {
-  background-color: #e7f1ff;
-  border-color: #b6d4ff;
-}
