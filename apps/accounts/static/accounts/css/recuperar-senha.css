@@ -1,0 +1,87 @@
+body{
+    background-color: hsl(238, 82%, 15%);
+    margin: 0;
+    padding: 0;
+}
+header{
+    text-align: center;
+    color: #f0f0f0;
+    font-family: sans-serif;
+
+}
+img{
+    max-width: 200px;
+    height: auto;
+}
+div {
+    background-color: #fffcfc;
+    border-radius: 10px;
+    width: 80%;          
+    max-width: 400px;    
+    height: auto;        
+    text-align: center;
+    margin: auto;
+    font-family: sans-serif;
+    padding: 1em;
+}
+h1{
+ font-size: 1.5rem;
+ margin-bottom: 0.5em;
+}
+h4 {
+    margin-top: 0.2em;
+    font-weight: normal;
+}   
+.container{
+    text-align: left;
+}
+div {
+    background-color: #fffcfc;
+    border-radius: 10px;
+    width: 80%;          
+    max-width: 400px;    
+    height: auto;        
+    text-align: center;
+    margin: auto;
+    font-family: sans-serif;
+    padding: 1em;
+}
+
+h1{
+ font-size: 1.5rem;
+ margin-bottom: 0.5em;
+}
+h2 {
+    margin-top: 0.2em;
+    font-weight: normal;
+    
+}
+p{
+    display: block;
+    margin-bottom: 0.8em;
+}
+label {
+  display: block;
+  text-align: left;  
+  font-weight: bold;
+  padding: 1px  
+}
+input {
+    width: 100%;
+    max-width: 380px;
+    height: 30px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+input[type="submit"] {
+    background-color: hsl(238, 82%, 30%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
