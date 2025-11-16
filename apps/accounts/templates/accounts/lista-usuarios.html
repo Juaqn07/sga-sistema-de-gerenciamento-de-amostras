@@ -1,0 +1,87 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Gerenciar Usuários{% endblock title %}
+
+{% block content %}
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="mb-0">Gerenciar Usuários</h3>
+        <small>Adicione, edite ou remova usuários do sistema</small>
+      </div>
+      <div>
+        <a href="{% url 'accounts:criar_usuario' %}" class="btn btn-primary">
+          <i class="bi bi-person-plus me-2"></i> Cadastrar Novo Usuário
+        </a>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Função</th>
+                <th>Setor</th>
+                <th class="text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for usuario in usuarios_cadastrados %}
+              <tr>
+                <td>{{ usuario.get_full_name|default:usuario.username }}</td>
+                <td>{{ usuario.email|default:"N/A" }}</td>
+                <td>{{ usuario.funcao|default:"N/A" }}</td>
+                <td>{{ usuario.setor|default:"N/A" }}</td>
+                <td class="text-center">
+                  
+                  <a href="{% url 'accounts:editar_usuario' usuario.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+
+                  <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir" data-bs-toggle="modal" data-bs-target="#modalDeleteUser{{ usuario.id }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+
+              <div class="modal fade" id="modalDeleteUser{{ usuario.id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Confirmar Exclusão</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>Tem certeza que deseja excluir o usuário <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>?</p>
+                      <p class="text-danger small">Esta ação não pode ser desfeita.</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      
+                      <form action="{% url 'accounts:deletar_usuario' usuario.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Sim, excluir</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted p-4">
+                  Nenhum usuário cadastrado (além de você).
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+{% endblock content %}

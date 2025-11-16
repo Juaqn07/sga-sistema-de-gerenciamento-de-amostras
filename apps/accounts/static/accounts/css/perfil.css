@@ -2,11 +2,9 @@
 /* ESTILOS ESPECÍFICOS: Perfil                       */
 /* ================================================= */
 
-/* (Todo o código de header, menu e body foi removido) */
-
 /* Estilos de título específicos da página de perfil */
-h3{
-  color: var(--cor-principal); /* <-- Usando a variável global! */
+h3 {
+  color: var(--cor-principal);
   margin-bottom: 1rem;
   font-size: 2rem;
 }
@@ -14,6 +12,7 @@ h3{
 .card {
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+  min-width: 50px;
 }
 
 .card img.rounded-circle {
@@ -21,21 +20,12 @@ h3{
   height: 150px;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid var(--cor-principal); /* <-- Usando a variável global! */
+  border: 3px solid var(--cor-principal);
 }
 
-.row {
-  display: flex;
-  gap: 1rem;
-}
-
-.col-md-4 {
-  flex: 0 0 30%;
-}
-
-.col-md-8 {
-  flex: 0 0 65%;
-}
+/* REMOVIDAS as regras .row, .col-md-4, e .col-md-8
+  que quebravam a responsividade do Bootstrap.
+*/
 
 form .form-label {
   font-weight: 600;

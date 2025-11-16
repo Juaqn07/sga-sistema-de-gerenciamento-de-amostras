@@ -10,9 +10,11 @@ class UsuarioCustomizado(AbstractUser):
         ('Separador', 'Separador'),
     ]
 
-    # Nosso campo customizado
     funcao = models.CharField(
         max_length=20, choices=FUNCAO_CHOICES, null=True, blank=True)  # type: ignore
+
+    setor = models.CharField(max_length=50, null=True,
+                             blank=True)  # type: ignore
 
     def __str__(self):
         return self.username

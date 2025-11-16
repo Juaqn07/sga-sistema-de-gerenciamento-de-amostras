@@ -6,12 +6,14 @@ from .models import UsuarioCustomizado
 
 
 class UsuarioCustomizadoAdmin(UserAdmin):
-    # O 'fieldsets' padrão do UserAdmin, mais o nosso campo 'funcao'
-    fieldsets = UserAdmin.fieldsets + \
-        (('Campos Customizados', {'fields': ('funcao',)}),)  # type: ignore
+    # O 'fieldsets' padrão do UserAdmin, mais os nossos campos
+    fieldsets = UserAdmin.fieldsets + (
+        # Adiciona 'setor' junto com 'funcao'
+        ('Campos Customizados', {'fields': ('funcao', 'setor')}),
+    )  # type: ignore
     # O 'add_fieldsets' é para a tela de *criação* de usuário
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Campos Customizados', {'fields': ('funcao',)}),
+        ('Campos Customizados', {'fields': ('funcao', 'setor')}),
     )  # type: ignore
 
 

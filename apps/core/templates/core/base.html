@@ -24,6 +24,7 @@
 
     <header>
       <img src="{% static 'core/img/logo.png' %}" alt="Logo - SGA" />
+      <small style="color: #fff" >SGA - Sistema de Gerenciamento de Amostras</small>
       <div class="menuHeader">
         <div class="dropdown">
           <a
@@ -54,25 +55,25 @@
         >
           <i class="bi bi-house me-2"></i> Dashboard
         </a>
+        {% if user.funcao == 'Gestor' or user.funcao == 'Vendedor' %}
         <a
           href="{% url 'samples:criar_processo' %}"
           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
         >
           <i class="bi bi-file-earmark-plus me-2"></i> Criar Processo
         </a>
+        {% endif %}
 
-        {% if user.funcao == 'Gestor' or user.funcao == 'Vendedor' %}
         <a
           href="{% url 'samples:lista_processos' %}"
           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
         >
           <i class="bi bi-folder2-open me-2"></i> Processos Do Setor
         </a>
-        {% endif %}
-
+        
         {% if user.funcao == 'Gestor' %}
         <a
-          href="{% url 'accounts:cadastrar_usuario' %}"
+          href="{% url 'accounts:lista_usuarios' %}"
           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light"
         >
           <i class="bi bi-person-plus me-2"></i> Cadastrar Usuário

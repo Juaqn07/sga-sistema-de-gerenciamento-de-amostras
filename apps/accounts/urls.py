@@ -1,22 +1,24 @@
 from django.urls import path
-from . import views  # Importa as views do app
+from . import views
 
-# Isso é essencial para o Django saber que 'accounts:login' pertence a este app
 app_name = 'accounts'
 
 urlpatterns = [
-    # URL: / (raiz)
     path('', views.login_view, name='login'),
-
-    # URL: /cadastrar-usuario/
-    path('cadastrar-usuario/', views.register_user_view, name='cadastrar_usuario'),
-
-    # URL: /perfil/
+    path('logout/', views.logout_view, name='logout'),
     path('perfil/', views.profile_view, name='perfil'),
-
-    # URL: /recuperar-senha/
     path('recuperar-senha/', views.password_recovery_view, name='recuperar_senha'),
 
-    # URL: /logout/ (Esta não precisa de template, só de uma view)
-    path('logout/', views.logout_view, name='logout'),
+    # /usuarios/ (A nova lista de usuários)
+    path('usuarios/', views.user_list_view, name='lista_usuarios'),
+
+    # /usuarios/criar/ (O formulário de criação)
+    path('usuarios/criar/', views.user_create_view, name='criar_usuario'),
+
+    # /usuarios/1/editar/ (O formulário de edição)
+    path('usuarios/<int:pk>/editar/', views.user_edit_view, name='editar_usuario'),
+
+    # /usuarios/1/deletar/ (A ação de deletar)
+    path('usuarios/<int:pk>/deletar/',
+         views.user_delete_view, name='deletar_usuario'),
 ]

@@ -97,23 +97,10 @@ a.text-light:hover {
   box-sizing: border-box;
 }
 
-/* Usado em: perfil.html */
-.container.my-5 {
-  margin-left: var(--largura-menu);
-  padding-top: calc(var(--altura-header) + 2rem); /* Pula o header (ajustado) */
-  margin-bottom: 50px;
-  width: calc(100% - var(--largura-menu) - 2rem); /* Garante que não transborde */
-  padding-left: 2rem;
-  padding-right: 2rem;
-  box-sizing: border-box;
-}
-
 /* Usado em: criar-processo.html, processos-do-setor.html */
 .titulo-descricao {
   width: 100%;
   max-width: 45rem;
-  margin-left: calc(var(--largura-menu) + 1.875rem); /* 270px */
-  margin-top: calc(var(--altura-header) + 1.25rem);  /* 90px */
   margin-bottom: 0.9375rem;
   padding: 0;
   box-sizing: border-box;
@@ -123,23 +110,9 @@ a.text-light:hover {
 .container-fluid {
   position: relative;
   /* top: 1.25rem; (removido para simplificar) */
-  margin-top: 1.25rem;
-  margin-left: calc(var(--largura-menu) + 1.875rem); /* 270px */
   padding: 1.25rem;
   box-sizing: border-box;
   z-index: 1;
   overflow-y: auto;
   /* Ajuste para ocupar o espaço restante */
-  width: calc(100% - var(--largura-menu) - 1.875rem);
-}
-
-/* Usado em: cadastrar-usuario.html */
-.cards-wrapper {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-left: calc(var(--largura-menu) + 2rem); /* 272px */
-  margin-top: 1rem;   
-  width: calc(100% - var(--largura-menu) - 2rem);
-  box-sizing: border-box;
 }

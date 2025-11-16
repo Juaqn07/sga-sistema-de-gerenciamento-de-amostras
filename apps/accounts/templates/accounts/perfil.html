@@ -1,80 +1,83 @@
 {% extends "core/base.html" %}
 {% load static %}
+
 {% block title %}Meu Perfil{% endblock title %}
+
 {% block page_css %}
   <link rel="stylesheet" href="{% static 'accounts/css/perfil.css' %}">
 {% endblock page_css %}
+
 {% block content %}
-  <section class="d-flex">
-    <!-- Área do formulário -->
-    <div class="container my-5">
-      <!-- Título do formulário -->
-      <div class="mb-4">
-        <h3>Meu Perfil</h3>
-        <p>Gerencie suas informações pessoais e configurações</p>
-      </div>
-      <!-- Containers lado a lado -->
-      <div class="row">
-        <!-- Primeiro container -->
-        <div class="col-md-4 mb-4">
-          <div class="card p-3">
-            <!-- Foto de perfil -->
-            <div class="mb-3 text-center">
-              <img src="https://via.placeholder.com/150"
-                   class="rounded-circle img-fluid"
-                   alt="Foto de perfil"
-                   width="150"
-                   height="150" />
-              <input type="file" class="form-control mt-2" id="fotoPerfil" />
-            </div>
-            <!-- Informações do usuário -->
-            <div class="text-center">
-              <h5>Joao Zanoni</h5>
-              <p>Gestor</p>
-              <p>joao@example.com</p>
-              <p>Gestão</p>
-            </div>
+  <div>
+    <div class="mb-4">
+      <h3>Meu Perfil</h3>
+      <p>Gerencie suas informações pessoais e configurações</p>
+    </div>
+
+    <div class="row">
+      
+      <div class="col-md-4 mb-4">
+        <div class="card p-3">
+          <div class="mb-3 text-center">
+            <img src="https://via.placeholder.com/150"
+                 class="rounded-circle img-fluid"
+                 alt="Foto de perfil"
+                 width="150"
+                 height="150" />
+            <input type="file" class="form-control mt-2" id="fotoPerfil" />
+          </div>
+          
+          <div class="text-center">
+            <h5>{{ user.get_full_name|default:user.username }}</h5>
+            <p>{{ user.funcao|default:"N/A" }}</p>
+            <p>{{ user.email|default:"N/A" }}</p>
+            <p>{{ user.setor|default:"N/A" }}</p>
           </div>
         </div>
-        <!-- Segundo container -->
-        <div class="col-md-8 mb-4">
-          <div class="card p-3">
-            <h5>Dados Pessoais</h5>
-            <p>Atualize suas informações pessoais</p>
-            <!-- Formulário editável -->
-            <form>
-              <div class="mb-3">
-                <label for="nomeCompleto" class="form-label">Nome Completo</label>
-                <input type="text"
-                       class="form-control"
-                       id="nomeCompleto"
-                       value="Joao Zanoni" />
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" value="joao@example.com" />
-              </div>
-              <div class="mb-3">
-                <label for="senha" class="form-label">Nova Senha</label>
-                <input type="password" class="form-control" id="senha" />
-              </div>
-              <div class="mb-3">
-                <label for="confirmSenha" class="form-label">Confirmação da Nova Senha</label>
-                <input type="password" class="form-control" id="confirmSenha" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Função</label>
-                <input type="text" class="form-control" value="Gestor" readonly />
-              </div>
-              <!-- Botões -->
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Salvar</button>
-                <button type="button" class="btn btn-secondary">Cancelar</button>
-              </div>
-            </form>
-          </div>
+      </div>
+
+      <div class="col-md-8 mb-4">
+        <div class="card p-3">
+          <h5>Dados Pessoais</h5>
+          <p>Atualize suas informações pessoais</p>
+          
+          <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="nomeCompleto" class="form-label">Nome Completo</label>
+              <input type="text"
+                     class="form-control"
+                     id="nomeCompleto"
+                     value="{{ user.get_full_name }}" />
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" value="{{ user.email }}" />
+            </div>
+
+            <div class="mb-3">
+              <label for="senha" class="form-label">Nova Senha</label>
+              <input type="password" class="form-control" id="senha" placeholder="Deixe em branco para não alterar" />
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmSenha" class="form-label">Confirmação da Nova Senha</label>
+              <input type="password" class="form-control" id="confirmSenha" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Função</label>
+              <input type="text" class="form-control" value="{{ user.funcao }}" readonly />
+            </div>
+            
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">Salvar</button>
+              <button type="button" class="btn btn-secondary">Cancelar</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 {% endblock content %}
