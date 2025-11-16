@@ -1,4 +1,4 @@
-![Logo SGA](sga/apps/core/static/core/img/logo.png)
+![Logo SGA](./apps/core/static/core/img/logo.png)
 
 # SGA - Sistema de Gerenciamento de Amostras
 
