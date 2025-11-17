@@ -16,5 +16,8 @@ class UsuarioCustomizado(AbstractUser):
     setor = models.CharField(max_length=50, null=True,
                              blank=True)  # type: ignore
 
+    # 'fotos_perfil/' é a pasta para onde as fotos irão
+    foto = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)
+
     def __str__(self):
         return self.username

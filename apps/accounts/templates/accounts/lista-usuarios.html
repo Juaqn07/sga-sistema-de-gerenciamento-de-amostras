@@ -18,6 +18,18 @@
     </div>
 
     <div class="card shadow-sm">
+      
+      <div class="card-header bg-white border-0 pt-4 pb-0">
+        <form method="GET">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Buscar por nome, usuário ou email..." name="q" value="{{ query|default:'' }}">
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+
       <div class="card-body">
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
@@ -31,18 +43,17 @@
               </tr>
             </thead>
             <tbody>
-              {% for usuario in usuarios_cadastrados %}
+              
+              {% for usuario in page_obj %}
               <tr>
                 <td>{{ usuario.get_full_name|default:usuario.username }}</td>
                 <td>{{ usuario.email|default:"N/A" }}</td>
                 <td>{{ usuario.funcao|default:"N/A" }}</td>
                 <td>{{ usuario.setor|default:"N/A" }}</td>
                 <td class="text-center">
-                  
                   <a href="{% url 'accounts:editar_usuario' usuario.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">
                     <i class="bi bi-pencil"></i>
                   </a>
-
                   <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir" data-bs-toggle="modal" data-bs-target="#modalDeleteUser{{ usuario.id }}">
                     <i class="bi bi-trash"></i>
                   </button>
@@ -62,7 +73,6 @@
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                      
                       <form action="{% url 'accounts:deletar_usuario' usuario.id %}" method="POST">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Sim, excluir</button>
@@ -71,17 +81,77 @@
                   </div>
                 </div>
               </div>
-
+              
               {% empty %}
               <tr>
                 <td colspan="5" class="text-center text-muted p-4">
-                  Nenhum usuário cadastrado (além de você).
+                  {% if query %}
+                    Nenhum usuário encontrado para a busca "{{ query }}".
+                  {% else %}
+                    Nenhum usuário cadastrado (além de você).
+                  {% endif %}
                 </td>
               </tr>
               {% endfor %}
+
             </tbody>
           </table>
         </div>
       </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <div class="card-footer d-flex justify-content-end">
+        <nav>
+          <ul class="pagination mb-0">
+            
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1&q={{ query|default:'' }}">« Primeira</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query|default:'' }}">Anterior</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">« Primeira</span>
+              </li>
+              <li class="page-item disabled">
+                <span class="page-link">Anterior</span>
+              </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="page-item active" aria-current="page">
+                  <span class="page-link">{{ num }}</span>
+                </li>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}&q={{ query|default:'' }}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query|default:'' }}">Próxima</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&q={{ query|default:'' }}">Última »</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Próxima</span>
+              </li>
+              <li class="page-item disabled">
+                <span class="page-link">Última »</span>
+              </li>
+            {% endif %}
+
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+
     </div>
 {% endblock content %}

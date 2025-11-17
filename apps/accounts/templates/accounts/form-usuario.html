@@ -34,7 +34,7 @@
           <div class="row">
             <div class="col-md-6">
               <div class="mb-3">
-                <label for="{{ form.username.id_for_label }}" class="form-label">Usuário (para login)</label>
+                <label for="{{ form.username.id_for_label }}" class="form-label">Usuário (para login) *</label>
                 {{ form.username }}
                 {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors.as_text }}</div>{% endif %}
               </div>
@@ -49,13 +49,13 @@
                 {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors.as_text }}</div>{% endif %}
               </div>
               
-              {% if not form.instance.pk %}
-                <div class="mb-3">
-                  <label for="{{ form.password.id_for_label }}" class="form-label">Senha</label>
-                  {{ form.password }}
-                  {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors.as_text }}</div>{% endif %}
-                </div>
-              {% endif %}
+              <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">
+                  {% if form.instance.pk %}Nova Senha (Opcional){% else %}Senha *{% endif %}
+                </label>
+                {{ form.password }}
+                {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors.as_text }}</div>{% endif %}
+              </div>
 
             </div>
 
@@ -66,7 +66,7 @@
                 {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors.as_text }}</div>{% endif %}
               </div>
               <div class="mb-3">
-                <label for="{{ form.funcao.id_for_label }}" class="form-label">Função</label>
+                <label for="{{ form.funcao.id_for_label }}" class="form-label">Função *</label>
                 {{ form.funcao }}
                 {% if form.funcao.errors %}<div class="text-danger small">{{ form.funcao.errors.as_text }}</div>{% endif %}
               </div>
@@ -74,6 +74,14 @@
                 <label for="{{ form.setor.id_for_label }}" class="form-label">Setor</label>
                 {{ form.setor }}
                 {% if form.setor.errors %}<div class="text-danger small">{{ form.setor.errors.as_text }}</div>{% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.confirm_password.id_for_label }}" class="form-label">
+                  {% if form.instance.pk %}Confirmar Nova Senha{% else %}Confirmar Senha *{% endif %}
+                </label>
+                {{ form.confirm_password }}
+                {% if form.confirm_password.errors %}<div class="text-danger small">{{ form.confirm_password.errors.as_text }}</div>{% endif %}
               </div>
 
               {% if form.instance.pk and form.is_active %}

@@ -142,3 +142,9 @@ LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'dashboard:home'
 
 LOGOUT_REDIRECT_URL = 'accounts:login'
+
+# ---
+# Configurações de Arquivos de Mídia (Uploads de Usuários)
+# ---
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

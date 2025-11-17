@@ -7,7 +7,6 @@ urlpatterns = [
     path('', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('perfil/', views.profile_view, name='perfil'),
-    path('recuperar-senha/', views.password_recovery_view, name='recuperar_senha'),
 
     # /usuarios/ (A nova lista de usuários)
     path('usuarios/', views.user_list_view, name='lista_usuarios'),
