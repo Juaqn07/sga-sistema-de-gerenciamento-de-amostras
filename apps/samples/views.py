@@ -1,49 +1,69 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-
-# View para a página de lista (processos-do-setor.html)
+from django.contrib import messages
+from .models import Processo
+from .forms import ProcessoForm, ClienteForm
 
 
 @login_required
 def process_list_view(request):
+    # Filtra processos baseados na função do usuário
+    if request.user.funcao == 'Vendedor':
+        # Vendedor vê apenas os seus
+        processos = Processo.objects.filter(
+            criado_por=request.user).order_by('-data_criacao')
+    else:
+        # Gestor e Separador veem todos
+        processos = Processo.objects.all().order_by('-data_criacao')
 
-    # (MAIS TARDE, buscaremos os processos do banco)
-    # Por enquanto, enviamos uma lista vazia para testar o "molde"
     context = {
-        'processos': [],  # Lista de processos (vazia por enquanto)
-        'total_processos': 0
+        'processos': processos,
+        'total_processos': processos.count()
     }
     return render(request, 'samples/processos-do-setor.html', context)
-
-# View para a página de criação (criar-processo.html)
 
 
 @login_required
 def process_create_view(request):
-    # (A lógica do formulário virá aqui depois)
-    return render(request, 'samples/criar-processo.html')
+    # Apenas Vendedores e Gestores podem criar processos
+    if request.user.funcao == 'Separador':
+        messages.error(request, 'Você não tem permissão para criar processos.')
+        return redirect('samples:lista_processos')
 
-# View para a página de detalhes (detalhes-processo.html)
+    if request.method == 'POST':
+        processo_form = ProcessoForm(request.POST)
+        cliente_form = ClienteForm(request.POST)
+
+        if processo_form.is_valid() and cliente_form.is_valid():
+            # 1. Salva o Cliente
+            cliente = cliente_form.save()
+
+            # 2. Prepara o Processo (sem salvar ainda)
+            processo = processo_form.save(commit=False)
+
+            # 3. Preenche os dados automáticos
+            processo.cliente = cliente
+            processo.criado_por = request.user
+
+            # 4. Salva o Processo (o código será gerado automaticamente pelo model)
+            processo.save()
+
+            messages.success(request, 'Processo criado com sucesso!')
+            return redirect('samples:lista_processos')
+    else:
+        processo_form = ProcessoForm()
+        cliente_form = ClienteForm()
+
+    context = {
+        'processo_form': processo_form,
+        'cliente_form': cliente_form
+    }
+    return render(request, 'samples/criar-processo.html', context)
 
 
 @login_required
 def process_detail_view(request, pk):
-    # O 'pk' vem da URL (ex: /processos/1/)
+    # Busca o processo real ou retorna erro 404
+    processo = get_object_or_404(Processo, pk=pk)
 
-    # (MAIS TARDE, buscaremos o processo com o id=pk)
-    # Por enquanto, podemos "fingir" um objeto para o molde
-    context = {
-        'processo': {
-            'codigo': f'PRC-FAKE-{pk}',
-            'get_status_display': 'Em Progresso (Fake)',
-            'get_prioridade_display': 'Alta (Fake)',
-            'titulo': 'Processo de Teste Falso',
-            'descricao': 'Esta é uma descrição vinda da view.',
-            'criado_por': {'get_full_name': 'Usuário Falso'},
-            'data_criacao': None,  # (Django vai mostrar nada)
-            'setor_atual': 'Separação (Fake)',
-            'timeline': [],  # Timeline vazia por enquanto
-            'tipo_amostra': 'Pré-forma PET (Fake)',
-        }
-    }
-    return render(request, 'samples/detalhes-processo.html', context)
+    return render(request, 'samples/detalhes-processo.html', {'processo': processo})

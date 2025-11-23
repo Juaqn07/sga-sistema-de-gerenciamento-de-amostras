@@ -1,7 +1,7 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block title %}Criar Novo Processo{% endblock title %}
+{% block title %}Novo Processo{% endblock title %}
 
 {% block page_css %}
     <link rel="stylesheet" href="{% static 'samples/css/criar-processo.css' %}">
@@ -18,59 +18,41 @@
 <div class="container-fluid p-4">
   <div class="row g-4">
     <div class="col-lg-8">
-      <form class="bg-white p-4 rounded shadow-sm" method="POST">
+      
+      <form class="bg-white p-4 rounded shadow-sm" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+        
+        {% if processo_form.errors or cliente_form.errors %}
+            <div class="alert alert-danger">Corrija os erros abaixo.</div>
+        {% endif %}
+
         <h5 class="mb-3 fw-semibold">Informações do Processo</h5>
 
         <div class="mb-3">
           <label class="form-label">Título do processo *</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Ex: Análise de Qualidade - Lote A123"
-            required
-          />
+          {{ processo_form.titulo }}
+          <div class="text-danger small">{{ processo_form.titulo.errors }}</div>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Descrição *</label>
-          <textarea
-            class="form-control"
-            rows="3"
-            maxlength="1000"
-            placeholder="Descreva detalhadamente o processo..."
-            required
-          ></textarea>
+          {{ processo_form.descricao }}
+          <div class="text-danger small">{{ processo_form.descricao.errors }}</div>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Tipo de amostra *</label>
-          <select class="form-select" required>
-            <option selected>Pré-forma PET</option>
-            <option>Garrafa Finalizada</option>
-            <option>Tampa Plástica</option>
-            <option>Rótulo</option>
-            <option>Matéria Prima</option>
-            <option>Outro</option>
-          </select>
+          {{ processo_form.tipo_amostra }}
         </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label">Tipo de transporte</label>
-            <select class="form-select">
-              <option selected>Correios</option>
-              <option>Carga</option>
-              <option>Balcão</option>
-            </select>
+            {{ processo_form.tipo_transporte }}
           </div>
           <div class="col-md-6 mb-3">
             <label class="form-label">Prioridade</label>
-            <select class="form-select">
-              <option>Baixa</option>
-              <option selected>Normal</option>
-              <option>Alta</option>
-            </select>
+            {{ processo_form.prioridade }}
           </div>
         </div>
 
@@ -78,22 +60,12 @@
 
         <div class="mb-3">
           <label class="form-label">Nome/Razão Social do Cliente *</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Ex: Empresa ABC Ltda"
-            required
-          />
+          {{ cliente_form.nome }}
         </div>
 
         <div class="mb-3">
           <label class="form-label">A/C (Aos Cuidados de) *</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Ex: João Silva"
-            required
-          />
+          {{ cliente_form.responsavel }}
         </div>
 
         <h5 class="mt-4 mb-3 fw-semibold">Endereço de Entrega</h5>
@@ -101,100 +73,51 @@
         <div class="row">
           <div class="col-md-8 mb-3">
             <label class="form-label">Logradouro *</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Ex: Rua das Indústrias"
-              required
-            />
+            {{ cliente_form.logradouro }}
           </div>
           <div class="col-md-4 mb-3">
             <label class="form-label">Número *</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="123"
-              required
-            />
+            {{ cliente_form.numero }}
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label">Complemento</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Ex: Galpão 5, Sala 101"
-            />
+            {{ cliente_form.complemento }}
           </div>
           <div class="col-md-6 mb-3">
             <label class="form-label">Bairro *</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Ex: Distrito Industrial"
-              required
-            />
+            {{ cliente_form.bairro }}
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-5 mb-3">
             <label class="form-label">Cidade *</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Ex: São Paulo"
-              required
-            />
+            {{ cliente_form.cidade }}
           </div>
           <div class="col-md-2 mb-3">
             <label class="form-label">Estado *</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="UF"
-              required
-            />
+            {{ cliente_form.estado }}
           </div>
           <div class="col-md-5 mb-3">
             <label class="form-label">CEP *</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="12345-678"
-              required
-            />
+            {{ cliente_form.cep }}
           </div>
         </div>
 
         <h5 class="mt-4 mb-3 fw-semibold">Anexos</h5>
-
         <div class="anexos mb-4 p-4 border border-2 border-secondary-subtle rounded text-center bg-light position-relative">
-
-          <input
-            type="file"
-            id="formFileMultiple"
-            multiple
-            class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-          />
-          <p class="mb-1">
-            Arraste arquivos aqui ou
-            <a
-              href="#"
-              onclick="document.getElementById('formFileMultiple').click(); return false;"
-            >
-              clique para selecionar
-            </a>
-          </p>
+          <p class="mb-1">Funcionalidade de anexos múltiplos será implementada em breve.</p>
           <small class="text-muted">
-            Suporta PDF, JPG, PNG, CSV até 50MB por arquivo
+            Use o painel de detalhes após criar o processo para adicionar arquivos.
           </small>
         </div>
-          <button type="submit" class="btn btn-primary">
+
+        <button type="submit" class="btn btn-primary w-100">
           Criar Processo
-          </button>
+        </button>
       </form>
     </div>
 
@@ -202,17 +125,11 @@
       <div class="bg-white p-4 rounded shadow-sm mb-3">
         <h5 class="fw-semibold mb-3">Resumo</h5>
         <p><strong>Criador:</strong><br />{{ user.get_full_name|default:user.username }}</p>
-        <p><strong>Tipo de Transporte:</strong><br />Correios</p>
-        <p>
-          <strong>Prioridade:</strong><br />
-          <span class="badge bg-secondary">Normal</span>
-        </p>
-      </div>
-
-      <div class="bg-light border p-3 rounded small">
-        <i class="bi bi-info-circle"></i>
-        Após enviar, o processo receberá um número único e será encaminhado
-        automaticamente para separação.
+        <p><strong>Data:</strong><br />{% now "d/m/Y" %}</p>
+        <div class="alert alert-info small mt-3 mb-0">
+            <i class="bi bi-info-circle"></i>
+            Após enviar, o processo receberá um código único automaticamente e será encaminhado para separação.
+        </div>
       </div>
     </div>
   </div>
