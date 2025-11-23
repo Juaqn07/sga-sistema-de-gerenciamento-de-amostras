@@ -143,16 +143,18 @@ def user_delete_view(request, pk):
     if request.method == 'POST':
         try:
             # Encontra o usuário
-            usuario_para_deletar = get_object_or_404(UsuarioCustomizado, pk=pk)
+            usuario_para_inativar = get_object_or_404(
+                UsuarioCustomizado, pk=pk)
 
             # Garante que o usuário não possa se auto-deletar
-            if usuario_para_deletar.id == request.user.id:
-                messages.error(request, 'Você não pode excluir a si mesmo.')
+            if usuario_para_inativar.id == request.user.id:
+                messages.error(request, 'Você não pode inativar a si mesmo.')
                 return redirect('accounts:lista_usuarios')
 
             # Deleta o usuário do banco
-            usuario_para_deletar.delete()
-            messages.success(request, 'Usuário excluído com sucesso.')
+            usuario_para_inativar.is_active = False
+            usuario_para_inativar.save()
+            messages.success(request, 'Usuário inativado com sucesso.')
 
         except UsuarioCustomizado.DoesNotExist:
             messages.error(request, 'Usuário não encontrado.')
