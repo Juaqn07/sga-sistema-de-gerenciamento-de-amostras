@@ -58,6 +58,10 @@
            class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light">
           <i class="bi bi-folder2-open me-2"></i> Processos Do Setor
         </a>
+        <a href="{% url 'samples:lista_clientes' %}"
+           class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light">
+          <i class="bi bi-people me-2"></i> Clientes
+        </a>
         {% if user.funcao == 'Gestor' %}
           <a href="{% url 'accounts:lista_usuarios' %}"
              class="d-flex align-items-center mb-3 text-decoration-none text-light p-2 rounded hover-bg-light">
@@ -67,10 +71,10 @@
       </div>
     </aside>
     <main class="content-area">
-    <!-- Caso haja mensagens na tela -->
+      <!-- Caso haja mensagens na tela -->
       {% if messages %}
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" 
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
                role="alert">
             {{ message }}
             <button type="button"

@@ -38,7 +38,7 @@
               <th>Nome</th>
               <th>Email</th>
               <th>Função</th>
-              <th>Status</th>
+              <th>Setor</th>
               <th class="text-center">Ações</th>
             </tr>
           </thead>
@@ -46,12 +46,19 @@
             {% for usuario in page_obj %}
               <tr class="{% if not usuario.is_active %}table-light text-muted{% endif %}">
                 <td>
-                  {{ usuario.get_full_name|default:usuario.username }}
+                  <div class="fw-bold text-limit mw-200px"
+                       title="{{ usuario.get_full_name|default:usuario.username }}">
+                    {{ usuario.get_full_name|default:usuario.username }}
+                  </div>
                   {% if not usuario.is_active %}<span class="badge bg-secondary ms-1">Inativo</span>{% endif %}
                 </td>
-                <td>{{ usuario.email|default:"N/A" }}</td>
+                <td>
+                  <div class="text-limit mw-250px" title="{{ usuario.email|default:'N/A' }}">{{ usuario.email|default:"N/A" }}</div>
+                </td>
                 <td>{{ usuario.funcao|default:"N/A" }}</td>
-                <td>{{ usuario.setor|default:"N/A" }}</td>
+                <td>
+                  <div class="text-limit mw-150px" title="{{ usuario.setor|default:'N/A' }}">{{ usuario.setor|default:"N/A" }}</div>
+                </td>
                 <td class="text-center">
                   <a href="{% url 'accounts:editar_usuario' usuario.id %}"
                      class="btn btn-sm btn-outline-secondary"
