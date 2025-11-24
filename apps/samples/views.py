@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Processo, Cliente, Anexo, EventoTimeline
+from .models import Processo, Cliente, Anexo, EventoTimeline, Comentario
 from .forms import ProcessoForm, ClienteForm
 # Para busca de clientes no formulário (AJAX)
-from django.db import models
+from django.db.models import Q, ProtectedError
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
@@ -14,18 +14,45 @@ from django.core.paginator import Paginator
 
 @login_required
 def process_list_view(request):
-    # Filtra processos baseados na função do usuário
+    # 1. Base da Query (Permissão de Visualização)
     if request.user.funcao == 'Vendedor':
-        # Vendedor vê apenas os seus
-        processos = Processo.objects.filter(
-            criado_por=request.user).order_by('-data_criacao')
+        processos = Processo.objects.filter(criado_por=request.user)
     else:
-        # Gestor e Separador veem todos
-        processos = Processo.objects.all().order_by('-data_criacao')
+        # Gestor e Separador veem tudo
+        processos = Processo.objects.all()
+
+    # 2. Filtros (Barra de Pesquisa e Dropdowns)
+    # Pega os parâmetros da URL (GET)
+    q = request.GET.get('q')
+    status_filter = request.GET.get('status')
+    prioridade_filter = request.GET.get('prioridade')
+
+    # Filtro de Texto (Busca)
+    if q:
+        processos = processos.filter(
+            Q(codigo__icontains=q) |
+            Q(codigo_rastreio__icontains=q) |
+            Q(titulo__icontains=q) |
+            Q(cliente__nome__icontains=q)
+        )
+
+    # Filtro de Status
+    if status_filter:
+        processos = processos.filter(status=status_filter)
+
+    # Filtro de Prioridade
+    if prioridade_filter:
+        processos = processos.filter(prioridade=prioridade_filter)
+
+    # Ordenação final
+    processos = processos.order_by('-data_criacao')
 
     context = {
         'processos': processos,
-        'total_processos': processos.count()
+        'total_processos': processos.count(),
+        # Enviando as opções para os dropdowns do template
+        'status_choices': Processo.STATUS_CHOICES,
+        'prioridade_choices': Processo.PRIORIDADE_CHOICES,
     }
     return render(request, 'samples/processos-do-setor.html', context)
 
@@ -100,8 +127,8 @@ def search_clientes_api(request):
     term = request.GET.get('term', '')
     # Pesquisa por nome, cnpj/cpf (se tiver) ou email
     clientes = Cliente.objects.filter(
-        models.Q(nome__icontains=term) |
-        models.Q(responsavel__icontains=term)
+        Q(nome__icontains=term) |
+        Q(responsavel__icontains=term)
     )[:10]  # Limita a 10 resultados
 
     results = []
@@ -201,9 +228,9 @@ def cliente_list_view(request):
 
     if query:
         clientes_list = clientes_list.filter(
-            models.Q(nome__icontains=query) |
-            models.Q(responsavel__icontains=query) |
-            models.Q(cidade__icontains=query)
+            Q(nome__icontains=query) |
+            Q(responsavel__icontains=query) |
+            Q(cidade__icontains=query)
         )
 
     # Paginação (10 por página)
@@ -260,8 +287,154 @@ def cliente_delete_view(request, pk):
         try:
             cliente.delete()
             messages.success(request, 'Cliente excluído com sucesso.')
-        except models.ProtectedError:
+        except ProtectedError:
             messages.error(
                 request, 'Não é possível excluir este cliente pois ele possui Processos vinculados.')
 
     return redirect('samples:lista_clientes')
+
+
+# -- APIs Para a Lista de Processos (Modais) --
+
+@login_required
+@require_http_methods(["POST"])
+def api_update_status(request, pk):
+    # Apenas Separador pode mudar status (Regra de Negócio)
+    if request.user.funcao != 'Separador':
+        return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
+
+    try:
+        processo = get_object_or_404(Processo, pk=pk)
+        data = json.loads(request.body)
+        novo_status = data.get('status')
+
+        # Salva o status antigo para a timeline
+        status_antigo = processo.get_status_display()
+
+        # Atualiza
+        processo.status = novo_status
+        processo.save()
+
+        # Registra na Timeline
+        EventoTimeline.objects.create(
+            processo=processo,
+            titulo="Status Alterado",
+            descricao=f"Mudou de '{status_antigo}' para '{processo.get_status_display()}'",
+            autor=request.user,
+            icone="bi-arrow-repeat"
+        )
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
+def api_update_rastreio(request, pk):
+    # Apenas Separador (Regra de Negócio)
+    if request.user.funcao != 'Separador':
+        return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
+
+    try:
+        processo = get_object_or_404(Processo, pk=pk)
+        data = json.loads(request.body)
+        codigo = data.get('codigo_rastreio')
+
+        processo.codigo_rastreio = codigo
+        processo.save()
+
+        # Timeline
+        EventoTimeline.objects.create(
+            processo=processo,
+            titulo="Código de Rastreio",
+            descricao=f"Código {codigo} adicionado/alterado.",
+            autor=request.user,
+            icone="bi-truck"
+        )
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
+def api_add_comentario(request, pk):
+    # Qualquer um pode comentar
+    try:
+        processo = get_object_or_404(Processo, pk=pk)
+        data = json.loads(request.body)
+        texto = data.get('texto')
+        encaminhar = data.get('encaminhar_gestao', False)
+
+        if not texto:
+            return JsonResponse({'status': 'error', 'message': 'Texto vazio.'}, status=400)
+
+        # Cria o comentário
+        Comentario.objects.create(
+            processo=processo,
+            autor=request.user,
+            texto=texto,
+            encaminhar_gestao=encaminhar
+        )
+
+        # Se for ocorrência (Gestão), marca na timeline também com destaque
+        if encaminhar:
+            EventoTimeline.objects.create(
+                processo=processo,
+                titulo="⚠️ Ocorrência Reportada",
+                descricao=f"Ocorrência encaminhada para gestão: {texto[:50]}...",
+                autor=request.user,
+                icone="bi-exclamation-triangle-fill"
+            )
+        else:
+            EventoTimeline.objects.create(
+                processo=processo,
+                titulo="Comentário Adicionado",
+                autor=request.user,
+                icone="bi-chat-left-text"
+            )
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+# -- Atribuição de Processos --
+
+
+@login_required
+@require_http_methods(["POST"])
+def api_assign_process(request, pk):
+    # Apenas Separadores (ou Gestores) podem assumir processos
+    if request.user.funcao != 'Separador':
+        return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
+
+    try:
+        processo = get_object_or_404(Processo, pk=pk)
+
+        # Regra de Negócio: Só pode atribuir se ainda não tiver dono
+        if processo.responsavel_separacao:
+            return JsonResponse({'status': 'error', 'message': 'Este processo já tem um responsável.'}, status=400)
+
+        # 1. Define o responsável
+        processo.responsavel_separacao = request.user
+
+        # 2. Muda status para 'atribuido' (se estiver em 'nao_atribuido')
+        if processo.status == 'nao_atribuido':
+            processo.status = 'atribuido'
+
+        processo.save()
+
+        # 3. Registra na Timeline
+        EventoTimeline.objects.create(
+            processo=processo,
+            titulo="Processo Atribuído",
+            descricao=f"O colaborador {request.user.get_full_name() or request.user.username} assumiu a responsabilidade.",
+            autor=request.user,
+            icone="bi-person-check-fill"
+        )
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

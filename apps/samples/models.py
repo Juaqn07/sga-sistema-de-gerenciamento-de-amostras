@@ -89,6 +89,13 @@ class Processo(models.Model):
         Cliente, on_delete=models.PROTECT, related_name='processos')
     criado_por = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='processos_criados')
+    responsavel_separacao = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='processos_atribuidos'
+    )
 
     # Controle de Fluxo
     status = models.CharField(
@@ -127,9 +134,9 @@ class Processo(models.Model):
         return 'bg-secondary-subtle text-secondary'
 
     def get_prioridade_classe_css(self):
-        if self.prioridade == 'Alta':
+        if self.prioridade == 'alta':
             return 'bg-danger'
-        if self.prioridade == 'Baixa':
+        if self.prioridade == 'baixa':
             return 'bg-success'
         return 'bg-secondary'  # Normal
 

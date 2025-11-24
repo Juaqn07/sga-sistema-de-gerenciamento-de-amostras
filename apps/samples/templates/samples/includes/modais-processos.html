@@ -1,0 +1,118 @@
+<div class="modal fade"
+     id="modalAlterarStatus"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Alterar Status</h1>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalProcessoInfo" class="text-muted small mb-3"></p>
+                <div class="mb-3">
+                    <label for="modalSelectStatus" class="form-label">Novo Status</label>
+                    <select class="form-select" id="modalSelectStatus">
+                        <option value="nao_atribuido">Não Atribuído</option>
+                        <option value="atribuido">Atribuído</option>
+                        <option value="em_separacao">Em Separação</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="pronto_envio">Pronto para Envio</option>
+                        <option value="em_rota">Em Rota de Entrega</option>
+                        <option value="nao_entregue">Não Entregue</option>
+                        <option value="entregue">Entregue</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnSalvarStatus">
+                    <i class="bi bi-check-circle me-1"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade"
+     id="modalCodigoRastreio"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Código de Rastreio</h1>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalRastreioInfo" class="text-muted small mb-3"></p>
+                <div class="mb-3">
+                    <label for="modalRastreioInput" class="form-label">Código (Correios/Transportadora)</label>
+                    <input type="text"
+                           class="form-control"
+                           id="modalRastreioInput"
+                           placeholder="Ex: AA123456789BR"
+                           maxlength="50">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnSalvarRastreio">
+                    <i class="bi bi-box-arrow-in-down me-1"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade"
+     id="modalAddComentario"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Relatar Ocorrência / Comentário</h1>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalComentarioInfo" class="text-muted small mb-3"></p>
+                <div class="mb-3">
+                    <label for="modalComentarioTextarea" class="form-label">Descrição</label>
+                    <textarea class="form-control"
+                              id="modalComentarioTextarea"
+                              rows="4"
+                              placeholder="Digite o detalhe da ocorrência ou observação..."></textarea>
+                </div>
+                <div class="form-check p-3 rounded border bg-light">
+                    <input class="form-check-input ms-0 me-2" type="checkbox" id="fluxoGestao">
+                    <label class="form-check-label" for="fluxoGestao">
+                        <strong class="d-block text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Encaminhar para Gestão
+                        </strong>
+                        <small class="text-muted">Marque se houver um problema (avaria, perda) que precise de atenção do gestor.</small>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarComentario">
+                    <i class="bi bi-send me-1"></i> Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -26,4 +26,16 @@ urlpatterns = [
          views.cliente_update_view, name='editar_cliente'),
     path('clientes/<int:pk>/deletar/',
          views.cliente_delete_view, name='deletar_cliente'),
+
+    # APIs para Modais
+    path('api/processo/<int:pk>/status/',
+         views.api_update_status, name='api_update_status'),
+    path('api/processo/<int:pk>/rastreio/',
+         views.api_update_rastreio, name='api_update_rastreio'),
+    path('api/processo/<int:pk>/comentario/',
+         views.api_add_comentario, name='api_add_comentario'),
+
+    # Atribuição
+    path('api/processo/<int:pk>/atribuir/',
+         views.api_assign_process, name='api_assign_process'),
 ]

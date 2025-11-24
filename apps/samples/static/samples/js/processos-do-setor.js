@@ -1,66 +1,132 @@
 /* =================================================== */
-/* ===== JAVASCRIPT DA PÁGINA PROCESSOS DO SETOR ===== */
-/* (Controla os 4 modais dinâmicos)                  */
+/* JAVASCRIPT DA PÁGINA PROCESSOS DO SETOR             */
 /* =================================================== */
 
+// Variável para guardar o ID do processo que está no modal aberto
+let processoPkAtual = null;
+
 document.addEventListener("DOMContentLoaded", function () {
-  // Pega a referência de TODOS os modais
-  var modalAlterarStatus = document.getElementById("modalAlterarStatus");
-  var modalCodigoRastreio = document.getElementById("modalCodigoRastreio");
-  var modalAddComentario = document.getElementById("modalAddComentario");
-  var modalEncaminharProcesso = document.getElementById(
-    "modalEncaminharProcesso"
-  );
-
-  // Função "Mestre" que lida com a abertura de qualquer modal
-  function handleModalOpen(event) {
-    // 'event.relatedTarget' é o ícone que foi clicado
-    var button = event.relatedTarget;
-    // 'event.target' é o modal que está sendo aberto
-    var modal = event.target;
-
-    // Pega os dados comuns (que todos os ícones têm)
-    var processoId = button.getAttribute("data-processo-id");
-    var processoTitulo = button.getAttribute("data-processo-titulo");
-    var infoText = processoId + " - " + processoTitulo;
-
-    // Verifica qual modal está sendo aberto e age de acordo
-    if (modal.id === "modalAlterarStatus") {
-      var processoStatus = button.getAttribute("data-processo-status");
-      var modalInfo = modal.querySelector("#modalProcessoInfo");
-      var modalSelect = modal.querySelector("#modalSelectStatus");
-
-      modalInfo.textContent = infoText;
-      modalSelect.value = processoStatus;
-    } else if (modal.id === "modalCodigoRastreio") {
-      var processoRastreio = button.getAttribute("data-processo-rastreio");
-      var modalInfo = modal.querySelector("#modalRastreioInfo");
-      var modalInput = modal.querySelector("#modalRastreioInput");
-
-      modalInfo.textContent = infoText;
-      modalInput.value = processoRastreio || ""; // Usa o código ou deixa em branco
-    } else if (modal.id === "modalAddComentario") {
-      var modalInfo = modal.querySelector("#modalComentarioInfo");
-      var modalTextarea = modal.querySelector("#modalComentarioTextarea");
-
-      modalInfo.textContent = infoText;
-      modalTextarea.value = ""; // Limpa comentários anteriores
-    } else if (modal.id === "modalEncaminharProcesso") {
-      var modalInfo = modal.querySelector("#modalEncaminharInfo");
-      var radioPadrao = modal.querySelector("#fluxoPadrao");
-
-      modalInfo.textContent = infoText;
-      radioPadrao.checked = true; // Sempre reseta para "Fluxo Padrão"
-    }
+  // Função para pegar CSRF
+  function getCsrfToken() {
+    // Tenta pegar do input (se houver form na página) ou cookie
+    const input = document.querySelector("[name=csrfmiddlewaretoken]");
+    if (input) return input.value;
+    return "";
   }
 
-  // Adiciona o "ouvinte" para CADA modal
-  if (modalAlterarStatus)
-    modalAlterarStatus.addEventListener("show.bs.modal", handleModalOpen);
-  if (modalCodigoRastreio)
-    modalCodigoRastreio.addEventListener("show.bs.modal", handleModalOpen);
-  if (modalAddComentario)
-    modalAddComentario.addEventListener("show.bs.modal", handleModalOpen);
-  if (modalEncaminharProcesso)
-    modalEncaminharProcesso.addEventListener("show.bs.modal", handleModalOpen);
+  // Função Genérica de Fetch
+  function sendData(url, data) {
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCsrfToken(),
+      },
+      body: JSON.stringify(data),
+    })
+      .then((r) => r.json())
+      .then((result) => {
+        if (result.status === "success") {
+          // Recarrega a página para mostrar o novo status/rastreio
+          window.location.reload();
+        } else {
+          alert("Erro: " + (result.message || "Erro desconhecido"));
+        }
+      })
+      .catch((err) => console.error(err));
+  }
+
+  // --- LÓGICA DE ABERTURA DOS MODAIS (Preencher dados) ---
+  const modais = document.querySelectorAll(".modal");
+  modais.forEach((modalEl) => {
+    modalEl.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget;
+      if (!button) return; // Se foi aberto via JS, ignora
+
+      // Pega os dados do botão
+      const pk = button.getAttribute("data-processo-pk");
+      const codigo = button.getAttribute("data-processo-id");
+      const titulo = button.getAttribute("data-processo-titulo");
+
+      // Salva PK globalmente
+      processoPkAtual = pk;
+
+      // Atualiza Título do Modal
+      const infoText = `${codigo} - ${titulo}`;
+
+      // Lógica específica de cada modal
+      if (modalEl.id === "modalAlterarStatus") {
+        modalEl.querySelector("#modalProcessoInfo").textContent = infoText;
+        const statusAtual = button.getAttribute("data-processo-status");
+        modalEl.querySelector("#modalSelectStatus").value = statusAtual;
+      } else if (modalEl.id === "modalCodigoRastreio") {
+        modalEl.querySelector("#modalRastreioInfo").textContent = infoText;
+        const rastreioAtual = button.getAttribute("data-processo-rastreio");
+        modalEl.querySelector("#modalRastreioInput").value =
+          rastreioAtual || "";
+      } else if (modalEl.id === "modalAddComentario") {
+        modalEl.querySelector("#modalComentarioInfo").textContent = infoText;
+        modalEl.querySelector("#modalComentarioTextarea").value = "";
+        modalEl.querySelector("#fluxoGestao").checked = false;
+      }
+    });
+  });
+
+  // --- LISTENERS DOS BOTÕES DE SALVAR ---
+
+  // 1. Salvar Status
+  const btnStatus = document.getElementById("btnSalvarStatus");
+  if (btnStatus) {
+    btnStatus.addEventListener("click", function () {
+      const novoStatus = document.getElementById("modalSelectStatus").value;
+      const url = `/processos/api/processo/${processoPkAtual}/status/`;
+      sendData(url, { status: novoStatus });
+    });
+  }
+
+  // 2. Salvar Rastreio
+  const btnRastreio = document.getElementById("btnSalvarRastreio");
+  if (btnRastreio) {
+    btnRastreio.addEventListener("click", function () {
+      const codigo = document.getElementById("modalRastreioInput").value;
+      const url = `/processos/api/processo/${processoPkAtual}/rastreio/`;
+      sendData(url, { codigo_rastreio: codigo });
+    });
+  }
+
+  // 3. Salvar Comentário
+  const btnComentario = document.getElementById("btnSalvarComentario");
+  if (btnComentario) {
+    btnComentario.addEventListener("click", function () {
+      const texto = document.getElementById("modalComentarioTextarea").value;
+      const gestao = document.getElementById("fluxoGestao").checked;
+      const url = `/processos/api/processo/${processoPkAtual}/comentario/`;
+      sendData(url, { texto: texto, encaminhar_gestao: gestao });
+    });
+  }
 });
+
+function atribuirProcesso(pk) {
+  if (!confirm("Deseja assumir a responsabilidade por este processo?")) return;
+
+  // Pega o token (reutilizando a função que já existe ou criando uma nova instância)
+  const token = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+  fetch(`/processos/api/processo/${pk}/atribuir/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": token,
+    },
+    body: JSON.stringify({}),
+  })
+    .then((r) => r.json())
+    .then((result) => {
+      if (result.status === "success") {
+        window.location.reload();
+      } else {
+        alert("Erro: " + result.message);
+      }
+    })
+    .catch((err) => console.error(err));
+}

@@ -72,3 +72,28 @@
   border-radius: 6px;
 }
 
+.input-group {
+  align-items: stretch !important;
+  flex-wrap: nowrap; /* Impede que quebre linha */
+}
+
+/* 2. Força altura fixa no Input */
+.input-group .form-control {
+  height: 38px !important;
+}
+
+/* 3. Força altura fixa no Botão e centraliza o ícone */
+.input-group .btn {
+  height: 38px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* 4. Ajuste fino para o ícone não aumentar o botão */
+.input-group .btn i {
+  font-size: 1rem; /* Garante tamanho padrão */
+  line-height: 1;
+}
