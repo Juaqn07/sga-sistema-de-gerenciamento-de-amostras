@@ -2,7 +2,21 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-# 1. Modelo de Cliente (Para armazenar os dados de entrega)
+# 1. Modelo para Múltiplos Tipos de Amostras
+
+
+class TipoAmostra(models.Model):
+    nome = models.CharField(max_length=50, unique=True)
+    ordem = models.IntegerField(
+        default=0, help_text="Menor número aparece primeiro")
+
+    class Meta:
+        ordering = ['ordem', 'nome']
+
+    def __str__(self):
+        return self.nome
+
+# 2. Modelo de Cliente (Para armazenar os dados de entrega)
 
 
 class Cliente(models.Model):
@@ -21,7 +35,7 @@ class Cliente(models.Model):
     def __str__(self):
         return self.nome
 
-# 2. Modelo Principal: Processo
+# 3. Modelo Principal: Processo
 
 
 class Processo(models.Model):
@@ -36,15 +50,6 @@ class Processo(models.Model):
         ('correios', 'Correios'),
         ('carga', 'Carga'),
         ('balcao', 'Balcão'),
-    ]
-
-    TIPO_AMOSTRA_CHOICES = [
-        ('preforma_pet', 'Pré-forma PET'),
-        ('garrafa_finalizada', 'Garrafa Finalizada'),
-        ('tampa_plastica', 'Tampa Plástica'),
-        ('rotulo', 'Rótulo'),
-        ('materia_prima', 'Matéria Prima'),
-        ('outro', 'Outro'),
     ]
 
     # Status do Fluxo (Baseado no seu modal de processos-do-setor.html)
@@ -64,9 +69,16 @@ class Processo(models.Model):
     codigo = models.CharField(max_length=20, unique=True, editable=False)
     titulo = models.CharField("Título do Processo", max_length=200)
     descricao = models.TextField("Descrição")
+    codigo_pedido_iniflex = models.CharField(
+        "Cód. Pedido Iniflex",
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Insira o número do pedido gerado no Iniflex para referência."
+    )
 
-    tipo_amostra = models.CharField(
-        max_length=50, choices=TIPO_AMOSTRA_CHOICES)
+    tipos_amostra = models.ManyToManyField(
+        TipoAmostra, related_name='processos')
     tipo_transporte = models.CharField(
         max_length=50, choices=TRANSPORTE_CHOICES, default='Correios')
     prioridade = models.CharField(
@@ -121,7 +133,7 @@ class Processo(models.Model):
             return 'bg-success'
         return 'bg-secondary'  # Normal
 
-# 3. Anexos (Arquivos)
+# 4. Anexos (Arquivos)
 
 
 class Anexo(models.Model):
@@ -133,7 +145,7 @@ class Anexo(models.Model):
     def nome_arquivo(self):
         return self.arquivo.name.split('/')[-1]
 
-# 4. Comentários e Ocorrências
+# 5. Comentários e Ocorrências
 
 
 class Comentario(models.Model):
@@ -151,7 +163,7 @@ class Comentario(models.Model):
     def __str__(self):
         return f"Comentário de {self.autor} em {self.processo}"
 
-# 5. Timeline (Histórico de Ações)
+# 6. Timeline (Histórico de Ações)
 
 
 class EventoTimeline(models.Model):

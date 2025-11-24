@@ -16,25 +16,35 @@ class ClienteForm(forms.ModelForm):
         # Adiciona estilo Bootstrap a todos os campos
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'form-control'})
+            self.fields[field].required = False
 
 
 class ProcessoForm(forms.ModelForm):
+
+    arquivo_pedido = forms.FileField(
+        required=False,
+        label="Anexo do Pedido (Opcional)",
+        help_text="Adicione o PDF do pedido ou imagem de referência.",
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Processo
         # Campos que o usuário preenche (o resto é automático)
-        fields = ['titulo', 'descricao', 'tipo_amostra',
-                  'tipo_transporte', 'prioridade']
+        fields = ['titulo', 'codigo_pedido_iniflex',
+                  'descricao', 'tipos_amostra', 'tipo_transporte', 'prioridade', 'arquivo_pedido']
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 3, 'maxlength': 1000}),
+            'tipos_amostra': forms.CheckboxSelectMultiple(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields:
-            # Adiciona estilo Bootstrap (o form-select do bootstrap é aplicado via classe também)
-            self.fields[field].widget.attrs.update({'class': 'form-control'})
+        for field_name, field in self.fields.items():
+            # CORREÇÃO: Só aplica 'form-control' se NÃO for os checkboxes
+            if field_name != 'tipos_amostra':
+                field.widget.attrs.update({'class': 'form-control'})
 
-            # Ajuste específico para selects ficarem com o estilo nativo do bootstrap
-            if isinstance(self.fields[field].widget, forms.Select):
-                self.fields[field].widget.attrs.update(
-                    {'class': 'form-select'})
+            # Ajuste específico para selects
+            if isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})

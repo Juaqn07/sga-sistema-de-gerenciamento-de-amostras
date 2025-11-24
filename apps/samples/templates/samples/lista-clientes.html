@@ -1,0 +1,131 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}
+    Gerenciar Clientes
+{% endblock title %}
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-0">Clientes</h3>
+            <small>Gerencie a base de clientes e destinatários</small>
+        </div>
+        <div>
+            <a href="{% url 'samples:criar_cliente' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i> Novo Cliente
+            </a>
+        </div>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+            <form method="GET">
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Buscar por nome, responsável ou cidade..."
+                           name="q"
+                           value="{{ query|default:'' }}">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Razão Social</th>
+                            <th>Responsável (A/C)</th>
+                            <th>Cidade/UF</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cliente in page_obj %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-limit mw-250px" title="{{ cliente.nome }}">{{ cliente.nome }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-limit mw-150px" title="{{ cliente.responsavel }}">{{ cliente.responsavel }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-limit mw-150px"
+                                         title="{{ cliente.cidade }}/{{ cliente.estado }}">
+                                        {{ cliente.cidade }}/{{ cliente.estado }}
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'samples:editar_cliente' cliente.id %}"
+                                       class="btn btn-sm btn-outline-secondary"
+                                       title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if user.funcao == 'Gestor' %}
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalDelete{{ cliente.id }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <div class="modal fade" id="modalDelete{{ cliente.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Excluir Cliente</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                Tem certeza que deseja excluir <strong>{{ cliente.nome }}</strong>?
+                                            </p>
+                                            <p class="text-danger small">Se este cliente tiver processos, a exclusão será bloqueada.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form action="{% url 'samples:deletar_cliente' cliente.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Sim, excluir</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted p-4">Nenhum cliente encontrado.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if page_obj.paginator.num_pages > 1 %}
+            <div class="card-footer d-flex justify-content-end">
+                <nav>
+                    <ul class="pagination mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?page={{ page_obj.previous_page_number }}&q={{ query|default:'' }}">Anterior</a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item disabled">
+                            <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?page={{ page_obj.next_page_number }}&q={{ query|default:'' }}">Próxima</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

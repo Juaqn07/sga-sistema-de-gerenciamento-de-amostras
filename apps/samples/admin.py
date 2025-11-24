@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Processo, Anexo, Comentario, EventoTimeline
+from .models import Cliente, Processo, Anexo, Comentario, EventoTimeline, TipoAmostra
 
 # Configuração para editar Anexos dentro da tela do Processo
 
@@ -28,6 +28,12 @@ class ProcessoAdmin(admin.ModelAdmin):
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ('nome', 'responsavel', 'cidade', 'estado')
     search_fields = ('nome', 'responsavel')
+
+
+@admin.register(TipoAmostra)
+class TipoAmostraAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'ordem')  # Mostra colunas Nome e Ordem
+    list_editable = ('ordem',)       # Permite editar a ordem direto na lista
 
 
 admin.site.register(EventoTimeline)

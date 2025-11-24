@@ -1,137 +1,324 @@
 {% extends "core/base.html" %}
 {% load static %}
-
-{% block title %}Novo Processo{% endblock title %}
-
+{% block title %}
+  Novo Processo
+{% endblock title %}
 {% block page_css %}
-    <link rel="stylesheet" href="{% static 'samples/css/criar-processo.css' %}">
+  <link rel="stylesheet" href="{% static 'samples/css/criar-processo.css' %}">
 {% endblock page_css %}
-
 {% block content %}
-<div class="justify-content-between align-items-center titulo-descricao">
-  <h4 class="mb-0">Criar Novo Processo</h4>
-  <small>
-    Preencha as informações do processo e anexe os documentos necessários
-  </small>
-</div>
-
-<div class="container-fluid p-4">
-  <div class="row g-4">
-    <div class="col-lg-8">
-      
-      <form class="bg-white p-4 rounded shadow-sm" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        {% if processo_form.errors or cliente_form.errors %}
-            <div class="alert alert-danger">Corrija os erros abaixo.</div>
-        {% endif %}
-
-        <h5 class="mb-3 fw-semibold">Informações do Processo</h5>
-
-        <div class="mb-3">
-          <label class="form-label">Título do processo *</label>
-          {{ processo_form.titulo }}
-          <div class="text-danger small">{{ processo_form.titulo.errors }}</div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Descrição *</label>
-          {{ processo_form.descricao }}
-          <div class="text-danger small">{{ processo_form.descricao.errors }}</div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Tipo de amostra *</label>
-          {{ processo_form.tipo_amostra }}
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Tipo de transporte</label>
-            {{ processo_form.tipo_transporte }}
+  <div class="justify-content-between align-items-center titulo-descricao">
+    <h4 class="mb-0">Criar Novo Processo</h4>
+  </div>
+  <div class="container-fluid p-4">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <form id="mainForm"
+              class="bg-white p-4 rounded shadow-sm"
+              method="POST"
+              enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden"
+                 id="selected_cliente_id"
+                 name="selected_cliente_id"
+                 required>
+          <h5 class="mb-3 fw-semibold">1. Informações do Processo</h5>
+          <div class="mb-3">
+            <label class="form-label">Título *</label>
+            {{ processo_form.titulo }}
           </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Prioridade</label>
-            {{ processo_form.prioridade }}
+          <div class="mb-3">
+            <label class="form-label">Código do Pedido (Iniflex)</label>
+            {{ processo_form.codigo_pedido_iniflex }}
           </div>
-        </div>
-
-        <h5 class="mt-4 mb-3 fw-semibold">Dados do Cliente</h5>
-
-        <div class="mb-3">
-          <label class="form-label">Nome/Razão Social do Cliente *</label>
-          {{ cliente_form.nome }}
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">A/C (Aos Cuidados de) *</label>
-          {{ cliente_form.responsavel }}
-        </div>
-
-        <h5 class="mt-4 mb-3 fw-semibold">Endereço de Entrega</h5>
-
-        <div class="row">
-          <div class="col-md-8 mb-3">
-            <label class="form-label">Logradouro *</label>
-            {{ cliente_form.logradouro }}
+          <div class="mb-3">
+            <label class="form-label">Descrição *</label>
+            {{ processo_form.descricao }}
           </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Número *</label>
-            {{ cliente_form.numero }}
+          <div class="mb-3">
+            <label class="form-label d-block">Tipos de Amostra (Selecione um ou mais) *</label>
+            <div class="amostra-list">
+              {% for checkbox in processo_form.tipos_amostra %}
+                <div class="form-check">
+                  <input type="checkbox"
+                         name="{{ checkbox.data.name }}"
+                         value="{{ checkbox.data.value }}"
+                         class="form-check-input"
+                         id="{{ checkbox.id_for_label }}"
+                         {% if checkbox.data.selected %}checked{% endif %}>
+                  <label class="form-check-label texto-tipo-amostra"
+                         for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="form-text text-muted small mt-1">
+              <i class="bi bi-info-circle"></i> Não encontrou o tipo? Solicite ao gestor.
+            </div>
+            {% if processo_form.tipos_amostra.errors %}
+              <div class="text-danger small mt-1">{{ processo_form.tipos_amostra.errors }}</div>
+            {% endif %}
           </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Complemento</label>
-            {{ cliente_form.complemento }}
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label class="form-label">Transporte</label>
+              {{ processo_form.tipo_transporte }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Prioridade</label>
+              {{ processo_form.prioridade }}
+            </div>
           </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Bairro *</label>
-            {{ cliente_form.bairro }}
+          <h5 class="mb-3 fw-semibold border-top pt-3">2. Cliente / Destinatário</h5>
+          <div id="area-busca" class="mb-3 position-relative">
+            <label class="form-label">Destinatário:</label>
+            <div class="input-group">
+              <input type="text"
+                     id="cliente-search"
+                     class="form-control"
+                     placeholder="Digite o nome e clique em pesquisar..."
+                     autocomplete="off">
+              <button class="btn btn-primary"
+                      type="button"
+                      id="btn-search"
+                      data-url="{% url 'samples:api_search_clientes' %}">
+                <i class="bi bi-search"></i>
+              </button>
+              <button class="btn btn-outline-primary"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalNovoCliente">Novo Destinatário</button>
+            </div>
+            <div id="search-results" class="list-group shadow d-none"></div>
           </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-5 mb-3">
-            <label class="form-label">Cidade *</label>
-            {{ cliente_form.cidade }}
+          <div id="card-cliente-selecionado"
+               class="card bg-light border-primary mb-3 d-none">
+            <div class="card-body position-relative">
+              <button type="button"
+                      class="btn btn-sm btn-outline-secondary me-1"
+                      id="btn-editar-cliente"
+                      title="Editar Dados">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button type="button"
+                      class="btn-close position-absolute top-0 end-0 m-2"
+                      onclick="limparCliente()"
+                      aria-label="Trocar"></button>
+              <h6 class="card-title fw-bold text-primary mb-1" id="card-nome">NOME DO CLIENTE</h6>
+              <p class="card-text mb-0 small">
+                <strong>A/C:</strong> <span id="card-ac">Responsável</span>
+              </p>
+              <p class="card-text mb-0 small">
+                <strong>Endereço:</strong> <span id="card-endereco">Rua X, 123 - Cidade/UF</span>
+              </p>
+              <p class="card-text small">
+                <strong>CEP:</strong> <span id="card-cep">00000-000</span>
+              </p>
+            </div>
           </div>
-          <div class="col-md-2 mb-3">
-            <label class="form-label">Estado *</label>
-            {{ cliente_form.estado }}
+          <h5 class="mt-4 mb-3 fw-semibold">3. Anexos</h5>
+          <div class="mb-3">
+            <label class="form-label">{{ processo_form.arquivo_pedido.label }}</label>
+            {{ processo_form.arquivo_pedido }}
+            <div class="form-text">{{ processo_form.arquivo_pedido.help_text }}</div>
           </div>
-          <div class="col-md-5 mb-3">
-            <label class="form-label">CEP *</label>
-            {{ cliente_form.cep }}
+          <div class="alert alert-light border d-flex align-items-center"
+               role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <div class="small">
+              Precisa enviar mais arquivos? Você poderá adicionar múltiplos anexos na tela de detalhes após salvar.
+            </div>
           </div>
-        </div>
-
-        <h5 class="mt-4 mb-3 fw-semibold">Anexos</h5>
-        <div class="anexos mb-4 p-4 border border-2 border-secondary-subtle rounded text-center bg-light position-relative">
-          <p class="mb-1">Funcionalidade de anexos múltiplos será implementada em breve.</p>
-          <small class="text-muted">
-            Use o painel de detalhes após criar o processo para adicionar arquivos.
-          </small>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">
-          Criar Processo
-        </button>
-      </form>
-    </div>
-
-    <div class="col-lg-4">
-      <div class="bg-white p-4 rounded shadow-sm mb-3">
-        <h5 class="fw-semibold mb-3">Resumo</h5>
-        <p><strong>Criador:</strong><br />{{ user.get_full_name|default:user.username }}</p>
-        <p><strong>Data:</strong><br />{% now "d/m/Y" %}</p>
-        <div class="alert alert-info small mt-3 mb-0">
-            <i class="bi bi-info-circle"></i>
-            Após enviar, o processo receberá um código único automaticamente e será encaminhado para separação.
+          <button type="submit" class="btn btn-primary w-100">Salvar Processo</button>
+        </form>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white p-4 rounded shadow-sm mb-3">
+          <h5 class="fw-semibold mb-3">Resumo</h5>
+          <p>
+            <strong>Criador:</strong>
+            <br />
+            {{ user.get_full_name|default:user.username }}
+          </p>
+          <p>
+            <strong>Data:</strong>
+            <br />
+            {% now "d/m/Y" %}
+          </p>
         </div>
       </div>
     </div>
   </div>
-</div>
+  <div class="modal fade"
+       id="modalNovoCliente"
+       tabindex="-1"
+       aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Novo Destinatário</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formNovoCliente">
+            <div class="mb-3">
+              <label class="form-label">Nome do Destinatário *</label>
+              <input type="text" class="form-control" name="nome" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">A/C (Responsável) *</label>
+                <input type="text" class="form-control" name="responsavel" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">CEP</label>
+                <input type="text" class="form-control" name="cep">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-9 mb-3">
+                <label class="form-label">Logradouro *</label>
+                <input type="text" class="form-control" name="logradouro" required>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Número *</label>
+                <input type="text" class="form-control" name="numero" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Bairro *</label>
+                <input type="text" class="form-control" name="bairro" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Complemento</label>
+                <input type="text" class="form-control" name="complemento">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-9 mb-3">
+                <label class="form-label">Cidade *</label>
+                <input type="text" class="form-control" name="cidade" required>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">UF *</label>
+                <input type="text" class="form-control" name="estado" maxlength="2" required>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button"
+                  class="btn btn-primary"
+                  data-url="{% url 'samples:api_create_cliente' %}"
+                  id="btn-salvar-novo">Salvar Destinatário</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade"
+       id="modalEditarCliente"
+       tabindex="-1"
+       aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil-square me-2"></i>Editar Destinatário
+          </h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formEditarCliente">
+            <input type="hidden" name="id" id="edit-id">
+            <div class="mb-3">
+              <label class="form-label">Nome do Destinatário *</label>
+              <input type="text" class="form-control" name="nome" id="edit-nome" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">A/C (Responsável) *</label>
+                <input type="text"
+                       class="form-control"
+                       name="responsavel"
+                       id="edit-responsavel"
+                       required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">CEP</label>
+                <input type="text" class="form-control" name="cep" id="edit-cep">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-9 mb-3">
+                <label class="form-label">Logradouro *</label>
+                <input type="text"
+                       class="form-control"
+                       name="logradouro"
+                       id="edit-logradouro"
+                       required>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Número *</label>
+                <input type="text"
+                       class="form-control"
+                       name="numero"
+                       id="edit-numero"
+                       required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Bairro *</label>
+                <input type="text"
+                       class="form-control"
+                       name="bairro"
+                       id="edit-bairro"
+                       required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Complemento</label>
+                <input type="text"
+                       class="form-control"
+                       name="complemento"
+                       id="edit-complemento">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-9 mb-3">
+                <label class="form-label">Cidade *</label>
+                <input type="text"
+                       class="form-control"
+                       name="cidade"
+                       id="edit-cidade"
+                       required>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">UF *</label>
+                <input type="text"
+                       class="form-control"
+                       name="estado"
+                       id="edit-estado"
+                       maxlength="2"
+                       required>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btn-salvar-edicao">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
+{% block page_js %}
+  <script src="{% static 'samples/js/criar-processo.js' %}"></script>
+{% endblock page_js %}
