@@ -1,5 +1,5 @@
 from django import forms
-from .models import Processo, Cliente
+from .models import Processo, Cliente, Anexo
 
 
 class ClienteForm(forms.ModelForm):
@@ -48,3 +48,13 @@ class ProcessoForm(forms.ModelForm):
             # Ajuste específico para selects
             if isinstance(field.widget, forms.Select):
                 field.widget.attrs.update({'class': 'form-select'})
+
+
+class AnexoForm(forms.ModelForm):
+    class Meta:
+        model = Anexo
+        fields = ['arquivo']
+        widgets = {
+            # O segredo está aqui: 'multiple': True permite selecionar vários arquivos na janela
+            'arquivo': forms.ClearableFileInput(attrs={'class': 'form-control', 'allow_multiple_selected': True}),
+        }

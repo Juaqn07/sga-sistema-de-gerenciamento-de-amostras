@@ -1,56 +1,68 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Processo, Cliente, Anexo, EventoTimeline, Comentario
-from .forms import ProcessoForm, ClienteForm
-# Para busca de clientes no formulário (AJAX)
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q, ProtectedError
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-import json
-# Para o CRUD de clientes
 from django.core.paginator import Paginator
+import json
+
+from .models import Processo, Cliente, Anexo, EventoTimeline, Comentario
+from .forms import ProcessoForm, ClienteForm, AnexoForm
+
+# ==============================================================================
+# BLOCO 1: VIEWS DE PROCESSOS (CRUD E VISUALIZAÇÃO)
+# ==============================================================================
 
 
 @login_required
 def process_list_view(request):
-    # 1. Base da Query (Permissão de Visualização)
-    if request.user.funcao == 'Vendedor':
-        processos = Processo.objects.filter(criado_por=request.user)
-    else:
-        # Gestor e Separador veem tudo
-        processos = Processo.objects.all()
+    """
+    Exibe a lista de processos com filtros e lógica de permissão baseada na função.
+    """
+    user = request.user
 
-    # 2. Filtros (Barra de Pesquisa e Dropdowns)
-    # Pega os parâmetros da URL (GET)
+    # 1. Regra de Visualização por Função
+    if user.funcao == 'Gestor':
+        # Gestor vê tudo
+        processos = Processo.objects.all()
+    elif user.funcao == 'Vendedor':
+        # Vendedor vê apenas os processos que criou
+        processos = Processo.objects.filter(criado_por=user)
+    elif user.funcao == 'Separador':
+        # Separador vê:
+        # 1. Processos atribuídos a ele.
+        # 2. Processos sem responsável (para realizar auto-atribuição).
+        processos = Processo.objects.filter(
+            Q(responsavel_separacao=user) | Q(
+                responsavel_separacao__isnull=True)
+        )
+    else:
+        processos = Processo.objects.none()
+
+    # 2. Aplicação de Filtros (GET)
     q = request.GET.get('q')
     status_filter = request.GET.get('status')
     prioridade_filter = request.GET.get('prioridade')
 
-    # Filtro de Texto (Busca)
     if q:
         processos = processos.filter(
             Q(codigo__icontains=q) |
-            Q(codigo_rastreio__icontains=q) |
             Q(titulo__icontains=q) |
+            Q(codigo_rastreio__icontains=q) |
             Q(cliente__nome__icontains=q)
         )
-
-    # Filtro de Status
     if status_filter:
         processos = processos.filter(status=status_filter)
-
-    # Filtro de Prioridade
     if prioridade_filter:
         processos = processos.filter(prioridade=prioridade_filter)
 
-    # Ordenação final
     processos = processos.order_by('-data_criacao')
 
     context = {
         'processos': processos,
         'total_processos': processos.count(),
-        # Enviando as opções para os dropdowns do template
         'status_choices': Processo.STATUS_CHOICES,
         'prioridade_choices': Processo.PRIORIDADE_CHOICES,
     }
@@ -59,6 +71,10 @@ def process_list_view(request):
 
 @login_required
 def process_create_view(request):
+    """
+    Gerencia a criação de processos, incluindo a criação simultânea de clientes
+    e upload inicial de anexos.
+    """
     if request.user.funcao == 'Separador':
         messages.error(request, 'Você não tem permissão para criar processos.')
         return redirect('samples:lista_processos')
@@ -66,10 +82,9 @@ def process_create_view(request):
     if request.method == 'POST':
         processo_form = ProcessoForm(request.POST, request.FILES)
 
-        # Pega o ID do input oculto
+        # O ID do cliente vem de um input oculto (preenchido via busca AJAX ou Modal)
         cliente_id = request.POST.get('selected_cliente_id')
 
-        # Validações
         if not cliente_id:
             messages.error(
                 request, 'Por favor, selecione ou cadastre um destinatário.')
@@ -77,13 +92,17 @@ def process_create_view(request):
             try:
                 cliente = Cliente.objects.get(id=cliente_id)
 
+                # Salva o processo mas não comita ainda para injetar dados
                 processo = processo_form.save(commit=False)
-                processo.cliente = cliente  # Vincula o cliente selecionado
+                processo.cliente = cliente
                 processo.criado_por = request.user
                 processo.status = 'nao_atribuido'
                 processo.save()
+
+                # Salva relacionamento ManyToMany (Tipos de Amostra)
                 processo_form.save_m2m()
 
+                # Processa anexo inicial (Pedido Iniflex, etc)
                 arquivo_enviado = processo_form.cleaned_data.get(
                     'arquivo_pedido')
                 if arquivo_enviado:
@@ -92,12 +111,13 @@ def process_create_view(request):
                         arquivo=arquivo_enviado
                     )
 
+                # Registro inicial na Timeline
                 EventoTimeline.objects.create(
                     processo=processo,
                     titulo="Processo Criado",
                     descricao=f"Processo iniciado por {request.user.get_full_name() or request.user.username}.",
                     autor=request.user,
-                    icone="bi-plus-circle-fill"  # Ícone de 'novo'
+                    icone="bi-plus-circle-fill"
                 )
                 messages.success(request, 'Processo criado com sucesso!')
                 return redirect('samples:lista_processos')
@@ -116,206 +136,155 @@ def process_create_view(request):
 
 @login_required
 def process_detail_view(request, pk):
-    # Busca o processo real ou retorna erro 404
+    """
+    Exibe detalhes completos do processo e permite upload de anexos extras.
+    Contém travas de segurança para visualização.
+    """
     processo = get_object_or_404(Processo, pk=pk)
+    user = request.user
 
-    return render(request, 'samples/detalhes-processo.html', {'processo': processo})
+    # 1. Validação de Permissão de Visualização
+    tem_permissao = False
+    if user.funcao == 'Gestor':
+        tem_permissao = True
+    elif user.funcao == 'Vendedor' and processo.criado_por == user:
+        tem_permissao = True
+    elif user.funcao == 'Separador':
+        # Separador vê se for dele ou se estiver livre
+        if processo.responsavel_separacao == user or processo.responsavel_separacao is None:
+            tem_permissao = True
 
+    if not tem_permissao:
+        raise PermissionDenied(
+            "Você não tem permissão para visualizar este processo.")
 
-@login_required
-def search_clientes_api(request):
-    term = request.GET.get('term', '')
-    # Pesquisa por nome, cnpj/cpf (se tiver) ou email
-    clientes = Cliente.objects.filter(
-        Q(nome__icontains=term) |
-        Q(responsavel__icontains=term)
-    )[:10]  # Limita a 10 resultados
+    # 2. Processamento de Upload de Anexos
+    if request.method == 'POST':
+        # Segurança: Bloqueia edições em processos cancelados
+        if processo.is_cancelado:
+            messages.error(
+                request, 'Não é possível anexar arquivos em processos cancelados.')
+            return redirect('samples:detalhe_processo', pk=pk)
 
-    results = []
-    for c in clientes:
-        results.append({
-            'id': c.id,
-            'nome': c.nome,
-            'responsavel': c.responsavel,
-            'cidade': c.cidade,
-            'estado': c.estado,
-            'logradouro': c.logradouro,
-            'numero': c.numero,
-            'cep': c.cep
-        })
+        if 'upload_anexos' in request.POST:
+            form = AnexoForm(request.POST, request.FILES)
+            if form.is_valid():
+                arquivos = request.FILES.getlist('arquivo')
+                if arquivos:
+                    for f in arquivos:
+                        Anexo.objects.create(processo=processo, arquivo=f)
 
-    return JsonResponse({'results': results})
-
-
-@login_required
-@require_http_methods(["POST"])
-def create_cliente_api(request):
-    try:
-        data = json.loads(request.body)
-        # Cria o cliente direto
-        cliente = Cliente.objects.create(
-            nome=data.get('nome'),
-            responsavel=data.get('responsavel'),
-            cep=data.get('cep'),
-            logradouro=data.get('logradouro'),
-            numero=data.get('numero'),
-            complemento=data.get('complemento'),
-            bairro=data.get('bairro'),
-            cidade=data.get('cidade'),
-            estado=data.get('estado'),
-        )
-        return JsonResponse({
-            'status': 'success',
-            'cliente': {
-                'id': cliente.id,
-                'nome': cliente.nome,
-                'responsavel': cliente.responsavel,
-                'endereco': f"{cliente.logradouro}, {cliente.numero} - {cliente.cidade}/{cliente.estado}",
-                'cep': cliente.cep
-            }
-        })
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-
-
-@login_required
-@require_http_methods(["POST"])
-def edit_cliente_api(request, pk):
-    try:
-        cliente = get_object_or_404(Cliente, pk=pk)
-        data = json.loads(request.body)
-
-        # Atualiza os campos
-        cliente.nome = data.get('nome')
-        cliente.responsavel = data.get('responsavel')
-        cliente.cep = data.get('cep')
-        cliente.logradouro = data.get('logradouro')
-        cliente.numero = data.get('numero')
-        cliente.complemento = data.get('complemento')
-        cliente.bairro = data.get('bairro')
-        cliente.cidade = data.get('cidade')
-        cliente.estado = data.get('estado')
-
-        cliente.save()
-
-        return JsonResponse({
-            'status': 'success',
-            'cliente': {
-                'id': cliente.id,
-                'nome': cliente.nome,
-                'responsavel': cliente.responsavel,
-                'cep': cliente.cep,
-                'logradouro': cliente.logradouro,
-                'numero': cliente.numero,
-                'complemento': cliente.complemento,
-                'bairro': cliente.bairro,
-                'cidade': cliente.cidade,
-                'estado': cliente.estado,
-                'endereco_completo': f"{cliente.logradouro}, {cliente.numero} - {cliente.cidade}/{cliente.estado}"
-            }
-        })
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-
-
-# -- CRUD Clientes --
-
-@login_required
-def cliente_list_view(request):
-    # Busca
-    query = request.GET.get('q')
-    clientes_list = Cliente.objects.all().order_by('nome')
-
-    if query:
-        clientes_list = clientes_list.filter(
-            Q(nome__icontains=query) |
-            Q(responsavel__icontains=query) |
-            Q(cidade__icontains=query)
-        )
-
-    # Paginação (10 por página)
-    paginator = Paginator(clientes_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+                    EventoTimeline.objects.create(
+                        processo=processo,
+                        titulo="Anexos Adicionados",
+                        descricao=f"{len(arquivos)} arquivo(s) adicionado(s).",
+                        autor=request.user,
+                        icone="bi-paperclip"
+                    )
+                    messages.success(
+                        request, f'{len(arquivos)} arquivo(s) anexado(s)!')
+                return redirect('samples:detalhe_processo', pk=pk)
+    else:
+        form = AnexoForm()
 
     context = {
-        'page_obj': page_obj,
-        'query': query,
+        'processo': processo,
+        'anexo_form': form,
     }
-    return render(request, 'samples/lista-clientes.html', context)
+    return render(request, 'samples/detalhes-processo.html', context)
 
 
-@login_required
-def cliente_create_view(request):
-    if request.method == 'POST':
-        form = ClienteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Cliente cadastrado com sucesso!')
-            return redirect('samples:lista_clientes')
-    else:
-        form = ClienteForm()
-
-    return render(request, 'samples/form-cliente.html', {'form': form})
-
+# ==============================================================================
+# BLOCO 2: APIs PARA MODAIS E AÇÕES (AJAX)
+# ==============================================================================
 
 @login_required
-def cliente_update_view(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+@require_http_methods(["POST"])
+def api_toggle_cancel_process(request, pk):
+    """
+    API para Cancelar ou Reativar um processo.
+    Restrito a Gestores ou ao Criador do processo.
+    """
+    processo = get_object_or_404(Processo, pk=pk)
+    user = request.user
 
-    if request.method == 'POST':
-        form = ClienteForm(request.POST, instance=cliente)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Cliente atualizado com sucesso!')
-            return redirect('samples:lista_clientes')
-    else:
-        form = ClienteForm(instance=cliente)
+    if user.funcao != 'Gestor' and processo.criado_por != user:
+        return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
 
-    return render(request, 'samples/form-cliente.html', {'form': form})
+    try:
+        if processo.status == 'cancelado':
+            # Lógica de Reativação
+            processo.status = 'nao_atribuido'
+            processo.responsavel_separacao = None  # Retorna para a fila geral
+            processo.save()
 
+            EventoTimeline.objects.create(
+                processo=processo,
+                titulo="Processo Reativado",
+                descricao=f"Reaberto por {user.get_full_name()}. Voltou para a fila geral.",
+                autor=user,
+                icone="bi-arrow-counterclockwise"
+            )
+            msg = "Processo reativado com sucesso!"
+        else:
+            # Lógica de Cancelamento
+            processo.status = 'cancelado'
+            # Mantemos o responsável (se houver) para histórico
+            processo.save()
 
-@login_required
-def cliente_delete_view(request, pk):
-    # Apenas Gestores podem deletar clientes (Regra de negócio opcional)
-    if request.user.funcao != 'Gestor':
-        messages.error(request, 'Apenas gestores podem excluir clientes.')
-        return redirect('samples:lista_clientes')
+            EventoTimeline.objects.create(
+                processo=processo,
+                titulo="⛔ Processo Cancelado",
+                descricao=f"Cancelado por {user.get_full_name()}.",
+                autor=user,
+                icone="bi-x-octagon-fill"
+            )
+            msg = "Processo cancelado."
 
-    if request.method == 'POST':
-        cliente = get_object_or_404(Cliente, pk=pk)
-        try:
-            cliente.delete()
-            messages.success(request, 'Cliente excluído com sucesso.')
-        except ProtectedError:
-            messages.error(
-                request, 'Não é possível excluir este cliente pois ele possui Processos vinculados.')
+        return JsonResponse({'status': 'success', 'message': msg})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
-    return redirect('samples:lista_clientes')
-
-
-# -- APIs Para a Lista de Processos (Modais) --
 
 @login_required
 @require_http_methods(["POST"])
 def api_update_status(request, pk):
-    # Apenas Separador pode mudar status (Regra de Negócio)
+    """
+    API para atualizar o status do processo.
+    Implementa atribuição implícita: se não tiver dono, quem altera vira o dono.
+    """
     if request.user.funcao != 'Separador':
         return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
 
     try:
         processo = get_object_or_404(Processo, pk=pk)
+
+        # Segurança: Processo cancelado é imutável
+        if processo.is_cancelado:
+            return JsonResponse({'status': 'error', 'message': 'Processo cancelado. Ação bloqueada.'}, status=400)
+
+        # Regra: Não pode mexer no processo de outro separador
+        if processo.responsavel_separacao and processo.responsavel_separacao != request.user:
+            return JsonResponse({'status': 'error', 'message': 'Processo pertence a outro usuário.'}, status=403)
+
+        # Regra: Atribuição Implícita (Quem mexe, assume)
+        if not processo.responsavel_separacao:
+            processo.responsavel_separacao = request.user
+            EventoTimeline.objects.create(
+                processo=processo,
+                titulo="Processo Assumido",
+                descricao=f"Ao alterar o status, {request.user.get_full_name()} assumiu a responsabilidade.",
+                autor=request.user,
+                icone="bi-person-check-fill"
+            )
+
         data = json.loads(request.body)
         novo_status = data.get('status')
-
-        # Salva o status antigo para a timeline
         status_antigo = processo.get_status_display()
 
-        # Atualiza
         processo.status = novo_status
         processo.save()
 
-        # Registra na Timeline
         EventoTimeline.objects.create(
             processo=processo,
             titulo="Status Alterado",
@@ -332,23 +301,42 @@ def api_update_status(request, pk):
 @login_required
 @require_http_methods(["POST"])
 def api_update_rastreio(request, pk):
-    # Apenas Separador (Regra de Negócio)
+    """
+    API para atualizar código de rastreio.
+    Também implementa atribuição implícita.
+    """
     if request.user.funcao != 'Separador':
         return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
 
     try:
         processo = get_object_or_404(Processo, pk=pk)
+
+        if processo.is_cancelado:
+            return JsonResponse({'status': 'error', 'message': 'Processo cancelado.'}, status=400)
+
+        if processo.responsavel_separacao and processo.responsavel_separacao != request.user:
+            return JsonResponse({'status': 'error', 'message': 'Processo pertence a outro usuário.'}, status=403)
+
+        if not processo.responsavel_separacao:
+            processo.responsavel_separacao = request.user
+            EventoTimeline.objects.create(
+                processo=processo,
+                titulo="Processo Assumido",
+                descricao=f"Ao definir o rastreio, {request.user.get_full_name()} assumiu a responsabilidade.",
+                autor=request.user,
+                icone="bi-person-check-fill"
+            )
+
         data = json.loads(request.body)
         codigo = data.get('codigo_rastreio')
 
         processo.codigo_rastreio = codigo
         processo.save()
 
-        # Timeline
         EventoTimeline.objects.create(
             processo=processo,
             titulo="Código de Rastreio",
-            descricao=f"Código {codigo} adicionado/alterado.",
+            descricao=f"Código: {codigo}",
             autor=request.user,
             icone="bi-truck"
         )
@@ -361,9 +349,15 @@ def api_update_rastreio(request, pk):
 @login_required
 @require_http_methods(["POST"])
 def api_add_comentario(request, pk):
-    # Qualquer um pode comentar
+    """
+    API para adicionar comentários ou ocorrências.
+    """
     try:
         processo = get_object_or_404(Processo, pk=pk)
+
+        if processo.is_cancelado:
+            return JsonResponse({'status': 'error', 'message': 'Processo cancelado.'}, status=400)
+
         data = json.loads(request.body)
         texto = data.get('texto')
         encaminhar = data.get('encaminhar_gestao', False)
@@ -371,7 +365,6 @@ def api_add_comentario(request, pk):
         if not texto:
             return JsonResponse({'status': 'error', 'message': 'Texto vazio.'}, status=400)
 
-        # Cria o comentário
         Comentario.objects.create(
             processo=processo,
             autor=request.user,
@@ -379,12 +372,11 @@ def api_add_comentario(request, pk):
             encaminhar_gestao=encaminhar
         )
 
-        # Se for ocorrência (Gestão), marca na timeline também com destaque
         if encaminhar:
             EventoTimeline.objects.create(
                 processo=processo,
                 titulo="⚠️ Ocorrência Reportada",
-                descricao=f"Ocorrência encaminhada para gestão: {texto[:50]}...",
+                descricao=f"Encaminhado para gestão: {texto[:50]}...",
                 autor=request.user,
                 icone="bi-exclamation-triangle-fill"
             )
@@ -400,33 +392,32 @@ def api_add_comentario(request, pk):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
-# -- Atribuição de Processos --
-
 
 @login_required
 @require_http_methods(["POST"])
 def api_assign_process(request, pk):
-    # Apenas Separadores (ou Gestores) podem assumir processos
+    """
+    API para atribuição manual ("Atribuir a mim").
+    """
     if request.user.funcao != 'Separador':
         return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
 
     try:
         processo = get_object_or_404(Processo, pk=pk)
 
-        # Regra de Negócio: Só pode atribuir se ainda não tiver dono
+        if processo.is_cancelado:
+            return JsonResponse({'status': 'error', 'message': 'Não é possível assumir processos cancelados.'}, status=400)
+
         if processo.responsavel_separacao:
             return JsonResponse({'status': 'error', 'message': 'Este processo já tem um responsável.'}, status=400)
 
-        # 1. Define o responsável
         processo.responsavel_separacao = request.user
-
-        # 2. Muda status para 'atribuido' (se estiver em 'nao_atribuido')
+        # Se estiver "Não Atribuído", avança para "Atribuído"
         if processo.status == 'nao_atribuido':
             processo.status = 'atribuido'
 
         processo.save()
 
-        # 3. Registra na Timeline
         EventoTimeline.objects.create(
             processo=processo,
             titulo="Processo Atribuído",
@@ -438,3 +429,168 @@ def api_assign_process(request, pk):
         return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+# ==============================================================================
+# BLOCO 3: APIs DE CLIENTES (BUSCA E EDIÇÃO)
+# ==============================================================================
+
+@login_required
+def search_clientes_api(request):
+    term = request.GET.get('term', '')
+    # Pesquisa por nome ou responsável
+    clientes = Cliente.objects.filter(
+        Q(nome__icontains=term) | Q(responsavel__icontains=term)
+    )[:10]
+
+    results = []
+    for c in clientes:
+        results.append({
+            'id': c.id,
+            'nome': c.nome,
+            'responsavel': c.responsavel,
+            'cidade': c.cidade,
+            'estado': c.estado,
+            'logradouro': c.logradouro,
+            'numero': c.numero,
+            'cep': c.cep
+        })
+    return JsonResponse({'results': results})
+
+
+@login_required
+@require_http_methods(["POST"])
+def create_cliente_api(request):
+    try:
+        data = json.loads(request.body)
+        cliente = Cliente.objects.create(
+            nome=data.get('nome'), responsavel=data.get('responsavel'), cep=data.get('cep'),
+            logradouro=data.get('logradouro'), numero=data.get('numero'),
+            complemento=data.get('complemento'), bairro=data.get('bairro'),
+            cidade=data.get('cidade'), estado=data.get('estado'),
+        )
+        return JsonResponse({
+            'status': 'success',
+            'cliente': {
+                'id': cliente.id, 'nome': cliente.nome, 'responsavel': cliente.responsavel,
+                'endereco': f"{cliente.logradouro}, {cliente.numero} - {cliente.cidade}/{cliente.estado}",
+                'cep': cliente.cep
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
+def edit_cliente_api(request, pk):
+    try:
+        cliente = get_object_or_404(Cliente, pk=pk)
+        data = json.loads(request.body)
+
+        # Snapshot para auditoria
+        endereco_antigo = f"{cliente.logradouro}, {cliente.numero} - {cliente.cidade}/{cliente.estado} (CEP: {cliente.cep})"
+
+        # Atualização
+        cliente.nome = data.get('nome')
+        cliente.responsavel = data.get('responsavel')
+        cliente.cep = data.get('cep')
+        cliente.logradouro = data.get('logradouro')
+        cliente.numero = data.get('numero')
+        cliente.complemento = data.get('complemento')
+        cliente.bairro = data.get('bairro')
+        cliente.cidade = data.get('cidade')
+        cliente.estado = data.get('estado')
+        cliente.save()
+
+        endereco_novo = f"{cliente.logradouro}, {cliente.numero} - {cliente.cidade}/{cliente.estado} (CEP: {cliente.cep})"
+
+        # Auditoria: Se endereço mudou, notifica nos processos ativos
+        if endereco_antigo != endereco_novo:
+            processos_afetados = Processo.objects.filter(cliente=cliente).exclude(
+                status__in=['entregue', 'nao_entregue', 'cancelado']
+            )
+            for processo in processos_afetados:
+                EventoTimeline.objects.create(
+                    processo=processo,
+                    titulo="⚠️ Dados do Cliente Alterados",
+                    descricao=f"O endereço de entrega foi modificado.\n\nANTERIOR: {endereco_antigo}\nNOVO: {endereco_novo}\n\nAlterado por: {request.user.get_full_name()}",
+                    autor=request.user,
+                    icone="bi-geo-alt-fill"
+                )
+
+        return JsonResponse({
+            'status': 'success',
+            'cliente': {
+                'id': cliente.id, 'nome': cliente.nome, 'responsavel': cliente.responsavel,
+                'cep': cliente.cep, 'logradouro': cliente.logradouro,
+                'numero': cliente.numero, 'complemento': cliente.complemento,
+                'bairro': cliente.bairro, 'cidade': cliente.cidade,
+                'estado': cliente.estado,
+                'endereco_completo': f"{cliente.logradouro}, {cliente.numero} - {cliente.cidade}/{cliente.estado}"
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+# ==============================================================================
+# BLOCO 4: CRUD DE CLIENTES (VIEWS PADRÃO)
+# ==============================================================================
+
+@login_required
+def cliente_list_view(request):
+    query = request.GET.get('q')
+    clientes_list = Cliente.objects.all().order_by('nome')
+    if query:
+        clientes_list = clientes_list.filter(
+            Q(nome__icontains=query) |
+            Q(responsavel__icontains=query) |
+            Q(cidade__icontains=query)
+        )
+    paginator = Paginator(clientes_list, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'samples/lista-clientes.html', {'page_obj': page_obj, 'query': query})
+
+
+@login_required
+def cliente_create_view(request):
+    if request.method == 'POST':
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cliente cadastrado com sucesso!')
+            return redirect('samples:lista_clientes')
+    else:
+        form = ClienteForm()
+    return render(request, 'samples/form-cliente.html', {'form': form})
+
+
+@login_required
+def cliente_update_view(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    if request.method == 'POST':
+        form = ClienteForm(request.POST, instance=cliente)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cliente atualizado com sucesso!')
+            return redirect('samples:lista_clientes')
+    else:
+        form = ClienteForm(instance=cliente)
+    return render(request, 'samples/form-cliente.html', {'form': form})
+
+
+@login_required
+def cliente_delete_view(request, pk):
+    if request.user.funcao != 'Gestor':
+        messages.error(request, 'Apenas gestores podem excluir clientes.')
+        return redirect('samples:lista_clientes')
+    if request.method == 'POST':
+        cliente = get_object_or_404(Cliente, pk=pk)
+        try:
+            cliente.delete()
+            messages.success(request, 'Cliente excluído com sucesso.')
+        except ProtectedError:
+            messages.error(
+                request, 'Não é possível excluir este cliente pois ele possui Processos vinculados.')
+    return redirect('samples:lista_clientes')

@@ -2,12 +2,8 @@
 /* ESTILOS ESPECÍFICOS: Detalhes do Processo         */
 /* ================================================= */
 
-/* Wrapper principal que aplica o espaçamento do menu e header */
+/* Wrapper principal */
 .process-wrapper {
-  margin-left: var(--largura-menu);
-  padding: 2rem;
-  padding-top: calc(var(--altura-header) + 2rem);
-  width: calc(100% - var(--largura-menu));
   box-sizing: border-box;
 }
 
@@ -30,17 +26,7 @@
   font-weight: 600;
   margin: 0;
 }
-
-/* 2. Layout Colunas (Principal e Sidebar) */
-.process-layout-main {
-  /* Coluna da esquerda (col-lg-8) */
-}
-
-.process-layout-sidebar {
-  /* Coluna da direita (col-lg-4) */
-}
-
-/* 3. Cards Customizados */
+/* 2. Cards Customizados */
 
 /* Card de Informações (Topo Esquerda) */
 .info-card-footer {
@@ -73,6 +59,7 @@
   font-size: 1rem;
   font-weight: 500;
   margin: 0;
+  word-wrap: break-word; /* Previne que textos longos quebrem o layout */
 }
 .details-card .detail-item .badge {
   font-size: 0.9rem;
@@ -100,7 +87,7 @@
 }
 
 
-/* 4. Timeline (Aba Histórico) */
+/* 3. Timeline (Aba Histórico) */
 .process-timeline {
   list-style: none;
   padding: 0;

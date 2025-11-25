@@ -130,3 +130,32 @@ function atribuirProcesso(pk) {
     })
     .catch((err) => console.error(err));
 }
+
+function toggleCancelar(pk, acao) {
+  const mensagem =
+    acao === "cancelar"
+      ? "Tem certeza que deseja CANCELAR este processo?\n\nNinguém poderá mais alterá-lo ou adicionar anexos."
+      : "Deseja REATIVAR este processo?\n\nEle voltará para a fila 'Não Atribuído' e ficará disponível para separação.";
+
+  if (!confirm(mensagem)) return;
+
+  const token = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+  fetch(`/processos/api/processo/${pk}/cancelar/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": token,
+    },
+    body: JSON.stringify({}),
+  })
+    .then((r) => r.json())
+    .then((result) => {
+      if (result.status === "success") {
+        window.location.reload();
+      } else {
+        alert("Erro: " + result.message);
+      }
+    })
+    .catch((err) => console.error(err));
+}

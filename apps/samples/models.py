@@ -62,6 +62,7 @@ class Processo(models.Model):
         ('em_rota', 'Em Rota de Entrega'),
         ('entregue', 'Entregue'),
         ('nao_entregue', 'Não Entregue'),
+        ('cancelado', 'Cancelado'),
     ]
 
     # Campos do Processo
@@ -121,6 +122,10 @@ class Processo(models.Model):
     def __str__(self):
         return f"{self.codigo} - {self.titulo}"
 
+    @property
+    def is_cancelado(self):
+        return self.status == 'cancelado'
+
     # Métodos auxiliares para o template (Bootstrap classes)
     def get_status_classe_css(self):
         if self.status == 'em_separacao':
@@ -131,6 +136,8 @@ class Processo(models.Model):
             return 'bg-success-subtle text-success'
         if self.status == 'nao_entregue':
             return 'bg-danger-subtle text-danger'
+        if self.status == 'cancelado':
+            return 'bg-dark text-white'
         return 'bg-secondary-subtle text-secondary'
 
     def get_prioridade_classe_css(self):

@@ -8,6 +8,9 @@
         href="{% static 'samples/css/processos-do-setor.css' %}">
 {% endblock page_css %}
 {% block content %}
+  <form style="display: none;">
+    {% csrf_token %}
+  </form>
   <div class="justify-content-between align-items-center titulo-descricao">
     <h4 class="mb-0 fw-semibold">Processos do Setor</h4>
     <small class="text-muted">{{ processos.count }} processos encontrados</small>
@@ -15,7 +18,6 @@
   <div class="container-fluid p-4">
     <div class="bg-white p-3 rounded shadow-sm">
       <form method="GET" class="row g-3 align-items-center mb-4">
-        {% csrf_token %}
         <div class="col-md-6 col-lg-6">
           <div class="input-group">
             <input class="form-control"
@@ -126,40 +128,42 @@
                        title="Visualizar Detalhes">
                       <i class="bi bi-eye" role="button"></i>
                     </a>
-                    {% if user.funcao == 'Separador' %}
-                      {% if not processo.responsavel_separacao %}
-                        <i class="bi bi-person-plus-fill text-primary"
+                    {% if not processo.is_cancelado %}
+                      {% if user.funcao == 'Separador' %}
+                        {% if not processo.responsavel_separacao %}
+                          <i class="bi bi-person-plus-fill text-primary"
+                             role="button"
+                             title="Atribuir a mim"
+                             onclick="atribuirProcesso({{ processo.id }})"></i>
+                        {% endif %}
+                        <i class="bi bi-pencil-square text-secondary"
                            role="button"
-                           title="Atribuir a mim"
-                           onclick="atribuirProcesso({{ processo.id }})"></i>
+                           title="Alterar Status"
+                           data-bs-toggle="modal"
+                           data-bs-target="#modalAlterarStatus"
+                           data-processo-pk="{{ processo.id }}"
+                           data-processo-id="{{ processo.codigo }}"
+                           data-processo-titulo="{{ processo.titulo }}"
+                           data-processo-status="{{ processo.status }}"></i>
+                        <i class="bi bi-box text-secondary"
+                           role="button"
+                           title="Código de Rastreio"
+                           data-bs-toggle="modal"
+                           data-bs-target="#modalCodigoRastreio"
+                           data-processo-pk="{{ processo.id }}"
+                           data-processo-id="{{ processo.codigo }}"
+                           data-processo-titulo="{{ processo.titulo }}"
+                           data-processo-rastreio="{{ processo.codigo_rastreio|default:'' }}"></i>
                       {% endif %}
-                      <i class="bi bi-pencil-square text-secondary"
+                      <i class="bi bi-chat-square-text text-secondary"
                          role="button"
-                         title="Alterar Status"
+                         title="Adicionar Comentário"
                          data-bs-toggle="modal"
-                         data-bs-target="#modalAlterarStatus"
+                         data-bs-target="#modalAddComentario"
                          data-processo-pk="{{ processo.id }}"
                          data-processo-id="{{ processo.codigo }}"
-                         data-processo-titulo="{{ processo.titulo }}"
-                         data-processo-status="{{ processo.status }}"></i>
-                      <i class="bi bi-box text-secondary"
-                         role="button"
-                         title="Código de Rastreio"
-                         data-bs-toggle="modal"
-                         data-bs-target="#modalCodigoRastreio"
-                         data-processo-pk="{{ processo.id }}"
-                         data-processo-id="{{ processo.codigo }}"
-                         data-processo-titulo="{{ processo.titulo }}"
-                         data-processo-rastreio="{{ processo.codigo_rastreio|default:'' }}"></i>
+                         data-processo-titulo="{{ processo.titulo }}"></i>
                     {% endif %}
-                    <i class="bi bi-chat-square-text text-secondary"
-                       role="button"
-                       title="Adicionar Comentário"
-                       data-bs-toggle="modal"
-                       data-bs-target="#modalAddComentario"
-                       data-processo-pk="{{ processo.id }}"
-                       data-processo-id="{{ processo.codigo }}"
-                       data-processo-titulo="{{ processo.titulo }}"></i>
                   </div>
                 </td>
               </tr>
