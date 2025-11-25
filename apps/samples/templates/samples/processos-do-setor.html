@@ -89,9 +89,9 @@
                 </td>
                 <td>
                   <div class="fw-semibold text-limit mw-150px"
-                      title="{{ processo.cliente.nome }}">{{ processo.cliente.nome }}</div>
+                       title="{{ processo.cliente.nome }}">{{ processo.cliente.nome }}</div>
                   <div class="text-muted small text-limit mw-150px"
-                      title="A/C: {{ processo.cliente.responsavel }}">A/C: {{ processo.cliente.responsavel }}</div>
+                       title="A/C: {{ processo.cliente.responsavel }}">A/C: {{ processo.cliente.responsavel }}</div>
                 </td>
                 <td>
                   <span class="badge {{ processo.get_status_classe_css }} px-3 py-2">{{ processo.get_status_display }}</span>
@@ -101,13 +101,13 @@
                     <div class="d-flex align-items-center">
                       {% if processo.responsavel_separacao.foto %}
                         <img src="{{ processo.responsavel_separacao.foto.url }}"
-                            class="rounded-circle me-2"
-                            width="24"
-                            height="24"
-                            alt="Responsável pelo Processo">
+                             class="rounded-circle me-2"
+                             width="24"
+                             height="24"
+                             alt="Responsável pelo Processo">
                       {% else %}
                         <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
-                            style="width: 24px;
+                             style="width: 24px;
                                     height: 24px;
                                     font-size: 10px">
                           {{ processo.responsavel_separacao.first_name|first|default:"U" }}
@@ -120,46 +120,47 @@
                   {% endif %}
                 </td>
                 <td class="text-center">
-                  {% if user.funcao == 'Separador' and not processo.responsavel_separacao %}
-                    <button class="btn btn-sm btn-outline-primary me-2"
-                            title="Atribuir a mim"
-                            onclick="atribuirProcesso({{ processo.id }})">
-                      <i class="bi bi-person-plus-fill"></i>
-                    </button>
-                  {% endif %}
-                  <a href="{% url 'samples:detalhe_processo' processo.id %}"
-                    class="text-secondary me-2"
-                    title="Visualizar Detalhes">
-                    <i class="bi bi-eye" role="button"></i>
-                  </a>
-                  {% if user.funcao == 'Separador' %}
-                    <i class="bi bi-pencil-square me-2 text-secondary"
-                      role="button"
-                      title="Alterar Status"
-                      data-bs-toggle="modal"
-                      data-bs-target="#modalAlterarStatus"
-                      data-processo-pk="{{ processo.id }}"
-                      data-processo-id="{{ processo.codigo }}"
-                      data-processo-titulo="{{ processo.titulo }}"
-                      data-processo-status="{{ processo.status }}"></i>
-                    <i class="bi bi-box me-2 text-secondary"
-                      role="button"
-                      title="Código de Rastreio"
-                      data-bs-toggle="modal"
-                      data-bs-target="#modalCodigoRastreio"
-                      data-processo-pk="{{ processo.id }}"
-                      data-processo-id="{{ processo.codigo }}"
-                      data-processo-titulo="{{ processo.titulo }}"
-                      data-processo-rastreio="{{ processo.codigo_rastreio|default:'' }}"></i>
-                  {% endif %}
-                  <i class="bi bi-chat-square-text text-secondary"
-                    role="button"
-                    title="Adicionar Comentário"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalAddComentario"
-                    data-processo-pk="{{ processo.id }}"
-                    data-processo-id="{{ processo.codigo }}"
-                    data-processo-titulo="{{ processo.titulo }}"></i>
+                  <div class="d-inline-flex align-items-center gap-2 text-nowrap">
+                    <a href="{% url 'samples:detalhe_processo' processo.id %}"
+                       class="text-secondary"
+                       title="Visualizar Detalhes">
+                      <i class="bi bi-eye" role="button"></i>
+                    </a>
+                    {% if user.funcao == 'Separador' %}
+                      {% if not processo.responsavel_separacao %}
+                        <i class="bi bi-person-plus-fill text-primary"
+                           role="button"
+                           title="Atribuir a mim"
+                           onclick="atribuirProcesso({{ processo.id }})"></i>
+                      {% endif %}
+                      <i class="bi bi-pencil-square text-secondary"
+                         role="button"
+                         title="Alterar Status"
+                         data-bs-toggle="modal"
+                         data-bs-target="#modalAlterarStatus"
+                         data-processo-pk="{{ processo.id }}"
+                         data-processo-id="{{ processo.codigo }}"
+                         data-processo-titulo="{{ processo.titulo }}"
+                         data-processo-status="{{ processo.status }}"></i>
+                      <i class="bi bi-box text-secondary"
+                         role="button"
+                         title="Código de Rastreio"
+                         data-bs-toggle="modal"
+                         data-bs-target="#modalCodigoRastreio"
+                         data-processo-pk="{{ processo.id }}"
+                         data-processo-id="{{ processo.codigo }}"
+                         data-processo-titulo="{{ processo.titulo }}"
+                         data-processo-rastreio="{{ processo.codigo_rastreio|default:'' }}"></i>
+                    {% endif %}
+                    <i class="bi bi-chat-square-text text-secondary"
+                       role="button"
+                       title="Adicionar Comentário"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalAddComentario"
+                       data-processo-pk="{{ processo.id }}"
+                       data-processo-id="{{ processo.codigo }}"
+                       data-processo-titulo="{{ processo.titulo }}"></i>
+                  </div>
                 </td>
               </tr>
             {% empty %}
