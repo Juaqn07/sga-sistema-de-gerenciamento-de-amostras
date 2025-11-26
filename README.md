@@ -1,152 +1,147 @@
-![Logo SGA](./apps/core/static/core/img/logo.png)
+<div align="center">
+  <img src="./apps/core/static/core/img/logo.png" alt="Logo SGA" width="120">
+  <h1>SGA - Sistema de Gerenciamento de Amostras</h1>
+  
+  <p>
+    <b>Otimização, Rastreabilidade e Controle para Processos Industriais</b>
+  </p>
 
-# SGA - Sistema de Gerenciamento de Amostras
-
-**Status:** 🚧 Em Desenvolvimento (Projeto Integrador) 🚧
-
-O **SGA** é um sistema web desenvolvido para otimizar os processos e melhorar a comunicação entre os setores envolvidos na separação e análise de amostras industriais, garantindo mais agilidade, organização e rastreabilidade nas operações.
-
-Este projeto foi desenvolvido como parte do Projeto Integrador do Curso Técnico em Informática do IFES.
+  <p>
+    <img src="https://img.shields.io/badge/status-em_desenvolvimento-yellow" alt="Status">
+    <img src="https://img.shields.io/badge/python-3.10+-blue" alt="Python Version">
+    <img src="https://img.shields.io/badge/django-5.0+-green" alt="Django Version">
+    <img src="https://img.shields.io/badge/license-Proprietária-red" alt="License">
+  </p>
+</div>
 
 ---
 
-## 🎯 Funcionalidades Principais
+## 📖 Sobre o Projeto
 
-O sistema foi projetado de acordo com os requisitos do Termo de Abertura, incluindo um robusto controle de acesso baseado em funções:
+O **SGA** é uma solução web robusta desenvolvida para modernizar o fluxo de separação e análise de amostras industriais. O sistema substitui controles manuais e planilhas por um fluxo de trabalho digital, auditável e seguro.
 
-### 🔐 Controle de Acesso por Função
-- **Gestor:** Acesso total; único autorizado a cadastrar usuários. Possui visão global dos processos.
-- **Vendedor:** Pode criar novos processos e visualizar apenas seus próprios pedidos.
-- **Separador:** Visualiza processos atribuídos e pode alterar o status das amostras.
+Focado na experiência do usuário e na integridade dos dados, o SGA implementa conceitos de **"Pull System"** (auto-atribuição de tarefas), **Auditoria em Tempo Real** (Timeline) e **Hierarquia de Permissões**.
 
-### 📦 Gestão de Processos
-- Criação de novos processos/pedidos de amostra.
-- Listagem e filtragem avançada por cliente, lote, data e status.
-- Dashboard com indicadores visuais e informações em tempo real.
+> Projeto desenvolvido como parte do Projeto Integrador do Curso Técnico em Informática do IFES.
 
-### 🔎 Rastreabilidade e Ocorrências
-- Acompanhamento completo do status das amostras.
-- Registro de ocorrências (problemas, perdas, atrasos).
+---
+
+## 🖥️ Visão Geral do Sistema
+
+### 📊 Dashboard Gerencial
+Visão centralizada dos indicadores de desempenho, com contadores de status e gráficos de produtividade semanal.
+
+![Dashboard](screenshots/dashboard_geral.png)
+*(Visão do Gestor com indicadores e gráficos em desenvolvimento)*
+
+---
+
+## ✨ Principais Funcionalidades
+
+### 1. Gestão de Processos (Core)
+O coração do sistema, focado em agilidade e rastreabilidade.
+
+* **Criação Inteligente:** Formulário de criação com busca de clientes via **AJAX** (estilo Correios/E-commerce) e cadastro rápido via Modal, sem sair da tela. Suporte a múltiplos tipos de amostra e upload de anexo inicial.
+* **Listagem Avançada:** Filtros dinâmicos por busca textual, status e prioridade. Paginação inteligente e separação visual para Gestores ("Meus Processos" vs "Todos").
+* **Fluxo de Atribuição:** Implementação de **Auto-atribuição**. Separadores visualizam a fila "Não Atribuída" e puxam a responsabilidade para si.
+
+![Criação de Processo](screenshots/fluxo_criacao.png)
+*(Interface de criação com busca AJAX e Modais)*
+
+### 2. Rastreabilidade e Detalhes
+Cada processo possui uma **Timeline** imutável que registra automaticamente:
+* Criação e Atribuição.
+* Mudanças de Status e definição de Rastreio.
+* Alterações críticas em dados do Cliente (Auditoria).
+* Uploads de anexos e registro de ocorrências.
+
+![Detalhes e Timeline](screenshots/detalhes_timeline.png)
+*(Timeline detalhada e gestão de anexos)*
+
+### 3. Módulo Administrativo (`accounts`)
+* **Controle de Acesso (RBAC):** Três níveis de permissão distintos:
+    * **Gestor:** Acesso total, CRUD de usuários, cancelamento de processos.
+    * **Vendedor:** Criação de pedidos, visualização restrita aos seus processos.
+    * **Separador:** Operação logística, alteração de status, inserção de rastreio.
+* **Segurança:** Implementação de **Soft Delete** (Inativação) para preservar histórico de usuários demitidos/removidos.
+
+![Lista de Usuários](screenshots/lista_usuarios.png)
+*(Gestão de usuários com Soft-Delete)*
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-O projeto utiliza um stack moderno baseado em Python e Django.
-
-- **Backend:** Python 3, Django  
-- **Frontend:** HTML5, CSS3, JavaScript  
-- **Framework CSS:** Bootstrap 5  
-- **Banco de Dados (Desenvolvimento):** SQLite3  
-- **Banco de Dados (Produção):** MySQL  
-- **Bibliotecas Python:** `Django`, `Pillow`  
-- **Ferramentas:** Git, GitHub, Trello, Figma  
+* **Backend:** Python 3, Django 5 (MVT Architecture)
+* **Frontend:** HTML5, CSS3 (Custom + Bootstrap 5), JavaScript (Vanilla + Fetch API)
+* **Banco de Dados:** SQLite3 (Dev) / MySQL (Prod - *Planejado*)
+* **Bibliotecas Chave:**
+    * `Pillow`: Processamento de imagens de perfil.
+    * `Chart.js`: Visualização de dados no dashboard.
+* **Ferramentas:** Git, GitHub, VS Code.
 
 ---
 
-## 🚀 Como Executar o Projeto
+## 🚀 Instalação e Execução
 
-Siga os passos abaixo para configurar o ambiente local.
+Siga os passos abaixo para rodar o projeto localmente.
 
-### ✔️ Pré-requisitos
-- Python **3.10+**
-- Git
+### Pré-requisitos
+* Python 3.10+
+* Git
 
----
+### Passo a Passo
 
-### 1. Clonar o Repositório
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/Juaqn07/sga-sistema-de-gerenciamento-de-amostras.git](https://github.com/Juaqn07/sga-sistema-de-gerenciamento-de-amostras.git)
+    cd sga-sistema-de-gerenciamento-de-amostras/sga
+    ```
 
-```bash
-git clone https://github.com/Juaqn07/sga-sistema-de-gerenciamento-de-amostras.git
-cd sga-sistema-de-gerenciamento-de-amostras/sga
-```
+2.  **Crie e ative o ambiente virtual:**
+    ```bash
+    python -m venv venv
+    # Windows
+    .\venv\Scripts\activate
+    # Linux/Mac
+    source venv/bin/activate
+    ```
 
----
+3.  **Instale as dependências:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-### 2. Criar e Ativar o Ambiente Virtual
+4.  **Configure o Banco de Dados:**
+    ```bash
+    python manage.py migrate
+    ```
 
-```bash
-# Criar o venv
-python -m venv venv
+5.  **Crie um Superusuário (Gestor):**
+    ```bash
+    python manage.py createsuperuser
+    ```
 
-# Ativar (Linux/Mac)
-source venv/bin/activate
-
-# Ativar (Windows PowerShell)
-.\venv\Scripts\Activate.ps1
-```
-
----
-
-### 3. Instalar as Dependências
-
-Certifique-se de que o arquivo `requirements.txt` está no projeto.
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-### 4. Configurar o Banco de Dados
-
-Gera o arquivo `db.sqlite3` e aplica as migrações:
-
-```bash
-python manage.py migrate
-```
+6.  **Execute o servidor:**
+    ```bash
+    python manage.py runserver
+    ```
+    Acesse: `http://127.0.0.1:8000/admin` e crie os primeiros usuários
 
 ---
 
-### 5. Criar um Superusuário (Gestor)
+## 👥 Equipe
 
-```bash
-python manage.py createsuperuser
-```
-
-Siga as instruções para configurar **username**, **email** e **password**.
-
----
-
-### 6. (Opcional) Criar Usuários de Teste
-
-1. Execute o servidor:
-
-   ```bash
-   python manage.py runserver
-   ```
-2. Acesse o admin: `http://127.0.0.1:8000/admin/`
-3. Faça login com o superusuário.
-4. Edite seu usuário e defina a **Função: Gestor**.
-5. Crie usuários adicionais como:
-
-   * `vendedor_teste`
-   * `separador_teste`
-
----
-
-### 7. Executar o Servidor
-
-```bash
-python manage.py runserver
-```
-
-Acesse o sistema:
-➡️ `http://127.0.0.1:8000/`
-
----
-
-## 👥 Equipe do Projeto
-
-* **Diego de Souza Gonoring** — Líder do Projeto / Desenvolvedor Front-End
-* **Evelin Santos de Jesus** — Documentadora
-* **Juan Ferreira dos Santos** — Desenvolvedor Back-End
-* **Julia Soares Moreira** — Desenvolvedora Front-End
+| Nome | Função |
+| :--- | :--- |
+| **Diego de Souza Gonoring** | Front-End / Prototipagem|
+| **Julia Soares Moreira** | Front-End / Prototipagem|
+| **Juan Ferreira dos Santos** | Back-End / Arquitetura |
+| **Evelin Santos de Jesus** | Documentação |
 
 ---
 
 ## ⚖️ Licença
 
-Este é um software proprietário. Todos os direitos são reservados.
-
-© 2025 — Equipe SGA (Diego, Evelin, Juan, Julia).
+Este é um software proprietário desenvolvido para fins acadêmicos e comerciais.
+Todos os direitos reservados © 2025 - Equipe SGA.
