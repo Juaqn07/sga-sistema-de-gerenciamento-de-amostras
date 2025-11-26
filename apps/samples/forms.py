@@ -28,11 +28,20 @@ class ProcessoForm(forms.ModelForm):
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
     )
 
+    # Campo opcional, visualmente tratado como "Código da Carga"
+    codigo_rastreio = forms.CharField(
+        required=False,
+        label="Código da Carga",
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Informe o código da carga'})
+    )
+
     class Meta:
         model = Processo
         # Campos que o usuário preenche (o resto é automático)
         fields = ['titulo', 'codigo_pedido_iniflex',
-                  'descricao', 'tipos_amostra', 'tipo_transporte', 'prioridade', 'arquivo_pedido']
+                  'descricao', 'tipos_amostra', 'tipo_transporte', 'prioridade',
+                  'arquivo_pedido', 'codigo_rastreio']
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 3, 'maxlength': 1000}),
             'tipos_amostra': forms.CheckboxSelectMultiple(),

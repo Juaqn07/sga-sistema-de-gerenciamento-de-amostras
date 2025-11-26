@@ -187,3 +187,28 @@ function limparCliente() {
   document.getElementById("cliente-search").value = "";
   document.getElementById("search-results").classList.add("d-none");
 }
+
+// --- LÓGICA TIPO TRANSPORTE (CARGA) ---
+const selectTransporte = document.getElementById("id_tipo_transporte"); // ID padrão do Django
+const divCodigoCarga = document.getElementById("divCodigoCarga");
+
+if (selectTransporte && divCodigoCarga) {
+  // Função para verificar o estado atual
+  function checkTransporte() {
+    if (selectTransporte.value === "carga") {
+      // Valor deve ser minúsculo conforme o models.py choices
+      divCodigoCarga.style.display = "block";
+    } else {
+      divCodigoCarga.style.display = "none";
+      // Limpa o campo se mudar de ideia, para não salvar lixo
+      const inputCarga = divCodigoCarga.querySelector("input");
+      if (inputCarga) inputCarga.value = "";
+    }
+  }
+
+  // Ouve mudanças
+  selectTransporte.addEventListener("change", checkTransporte);
+
+  // Roda ao carregar (caso tenha voltado de um erro de validação)
+  checkTransporte();
+}

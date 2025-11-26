@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q, ProtectedError
+from django.db.models import Q, ProtectedError, F, Case, When, Value, IntegerField
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
@@ -18,51 +18,69 @@ from .forms import ProcessoForm, ClienteForm, AnexoForm
 
 @login_required
 def process_list_view(request):
-    """
-    Exibe a lista de processos com filtros e lógica de permissão baseada na função.
-    """
     user = request.user
 
-    # 1. Regra de Visualização por Função
-    if user.funcao == 'Gestor':
-        # Gestor vê tudo
-        processos = Processo.objects.all()
-    elif user.funcao == 'Vendedor':
-        # Vendedor vê apenas os processos que criou
-        processos = Processo.objects.filter(criado_por=user)
+    # --- 1. QUERYSET BASE ---
+    if user.funcao == 'Vendedor':
+        base_qs = Processo.objects.filter(criado_por=user)
     elif user.funcao == 'Separador':
-        # Separador vê:
-        # 1. Processos atribuídos a ele.
-        # 2. Processos sem responsável (para realizar auto-atribuição).
-        processos = Processo.objects.filter(
+        base_qs = Processo.objects.filter(
             Q(responsavel_separacao=user) | Q(
                 responsavel_separacao__isnull=True)
         )
     else:
-        processos = Processo.objects.none()
+        # Gestor vê tudo
+        base_qs = Processo.objects.all()
 
-    # 2. Aplicação de Filtros (GET)
+    # --- 2. FILTROS ---
     q = request.GET.get('q')
     status_filter = request.GET.get('status')
     prioridade_filter = request.GET.get('prioridade')
 
     if q:
-        processos = processos.filter(
+        base_qs = base_qs.filter(
             Q(codigo__icontains=q) |
             Q(titulo__icontains=q) |
             Q(codigo_rastreio__icontains=q) |
             Q(cliente__nome__icontains=q)
         )
     if status_filter:
-        processos = processos.filter(status=status_filter)
+        base_qs = base_qs.filter(status=status_filter)
     if prioridade_filter:
-        processos = processos.filter(prioridade=prioridade_filter)
+        base_qs = base_qs.filter(prioridade=prioridade_filter)
 
-    processos = processos.order_by('-data_criacao')
+    # Ordenação padrão
+    base_qs = base_qs.order_by('-data_criacao')
+
+    # --- 3. SEPARAÇÃO PARA GESTOR ---
+    meus_processos_page_obj = None  # Variável para a paginação dos meus processos
+
+    if user.funcao == 'Gestor':
+        # Separa "Meus Processos"
+        meus_qs = base_qs.filter(
+            Q(criado_por=user) | Q(responsavel_separacao=user)
+        )
+
+        # Remove "Meus Processos" da lista geral
+        processos_qs = base_qs.exclude(id__in=meus_qs.values('id'))
+
+        # PAGINAÇÃO 1: MEUS PROCESSOS (Usando 'mp_page')
+        mp_paginator = Paginator(meus_qs, 5)
+        mp_page_number = request.GET.get('mp_page')
+        meus_processos_page_obj = mp_paginator.get_page(mp_page_number)
+
+    else:
+        processos_qs = base_qs
+
+    # --- 4. PAGINAÇÃO 2: LISTA PRINCIPAL (Usando 'page') ---
+    paginator = Paginator(processos_qs, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'processos': processos,
-        'total_processos': processos.count(),
+        'meus_processos': meus_processos_page_obj,  # Agora enviamos o objeto paginado
+        'page_obj': page_obj,
+        'total_processos': paginator.count + (meus_processos_page_obj.paginator.count if meus_processos_page_obj else 0),
         'status_choices': Processo.STATUS_CHOICES,
         'prioridade_choices': Processo.PRIORIDADE_CHOICES,
     }
@@ -301,45 +319,58 @@ def api_update_status(request, pk):
 @login_required
 @require_http_methods(["POST"])
 def api_update_rastreio(request, pk):
-    """
-    API para atualizar código de rastreio.
-    Também implementa atribuição implícita.
-    """
-    if request.user.funcao != 'Separador':
+    processo = get_object_or_404(Processo, pk=pk)
+    user = request.user
+
+    # 1. Verifica Permissões (Lógica Nova)
+    is_separador = user.funcao == 'Separador'
+    # Vendedor pode SE for o dono E for Carga
+    is_vendedor_dono_carga = (
+        processo.criado_por == user and
+        processo.tipo_transporte == 'carga'
+    )
+
+    if not (is_separador or is_vendedor_dono_carga):
         return JsonResponse({'status': 'error', 'message': 'Sem permissão.'}, status=403)
 
     try:
-        processo = get_object_or_404(Processo, pk=pk)
-
+        # 2. Verificações de Segurança Padrão
         if processo.is_cancelado:
             return JsonResponse({'status': 'error', 'message': 'Processo cancelado.'}, status=400)
 
-        if processo.responsavel_separacao and processo.responsavel_separacao != request.user:
+        # Se for Separador, mantém a regra de propriedade (só mexe no seu)
+        if is_separador and processo.responsavel_separacao and processo.responsavel_separacao != user:
             return JsonResponse({'status': 'error', 'message': 'Processo pertence a outro usuário.'}, status=403)
 
-        if not processo.responsavel_separacao:
-            processo.responsavel_separacao = request.user
+        # Auto-atribuição (Apenas para Separador)
+        if is_separador and not processo.responsavel_separacao:
+            processo.responsavel_separacao = user
             EventoTimeline.objects.create(
                 processo=processo,
                 titulo="Processo Assumido",
-                descricao=f"Ao definir o rastreio, {request.user.get_full_name()} assumiu a responsabilidade.",
-                autor=request.user,
+                autor=user,
                 icone="bi-person-check-fill"
             )
 
+        # 3. Atualização e Timeline
         data = json.loads(request.body)
-        codigo = data.get('codigo_rastreio')
+        novo_codigo = data.get('codigo_rastreio')
 
-        processo.codigo_rastreio = codigo
-        processo.save()
+        # Verifica se mudou para não poluir timeline
+        if processo.codigo_rastreio != novo_codigo:
+            processo.codigo_rastreio = novo_codigo
+            processo.save()
 
-        EventoTimeline.objects.create(
-            processo=processo,
-            titulo="Código de Rastreio",
-            descricao=f"Código: {codigo}",
-            autor=request.user,
-            icone="bi-truck"
-        )
+            # Título diferente dependendo de quem alterou
+            titulo_evento = "Código de Carga" if is_vendedor_dono_carga else "Código de Rastreio"
+
+            EventoTimeline.objects.create(
+                processo=processo,
+                titulo=titulo_evento,
+                descricao=f"Código definido/alterado para: {novo_codigo}",
+                autor=user,
+                icone="bi-truck"
+            )
 
         return JsonResponse({'status': 'success'})
     except Exception as e:

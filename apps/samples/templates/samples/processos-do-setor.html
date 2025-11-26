@@ -13,7 +13,7 @@
   </form>
   <div class="justify-content-between align-items-center titulo-descricao">
     <h4 class="mb-0 fw-semibold">Processos do Setor</h4>
-    <small class="text-muted">{{ processos.count }} processos encontrados</small>
+    <small class="text-muted">{{ total_processos }} processos encontrados</small>
   </div>
   <div class="container-fluid p-4">
     <div class="bg-white p-3 rounded shadow-sm">
@@ -58,118 +58,95 @@
           </div>
         {% endif %}
       </form>
+      {% if meus_processos %}
+        <div class="mb-4">
+          <h5 class="fw-bold text-primary mb-3">
+            <i class="bi bi-person-workspace me-2"></i>Meus Processos
+          </h5>
+          <div class="bg-white border rounded shadow-sm p-3">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 table-hover">
+                <thead class="table-primary">
+                  <tr>
+                    <th style="min-width: 150px;">Código/Rastreio</th>
+                    <th style="min-width: 250px;">Título</th>
+                    <th style="min-width: 200px;">Cliente</th>
+                    <th>Status</th>
+                    <th>Responsável</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for processo in meus_processos %}
+                    {% include "samples/includes/linha-tabela-processo.html" %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if meus_processos.paginator.num_pages > 1 %}
+              <div class="d-flex justify-content-end pt-3">
+                <nav>
+                  <ul class="pagination pagination-sm mb-0">
+                    {% if meus_processos.has_previous %}
+                      <li class="page-item">
+                        <a class="page-link"
+                           href="?mp_page={{ meus_processos.previous_page_number }}&page={{ page_obj.number }}&q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&prioridade={{ request.GET.prioridade|default:'' }}">Anterior</a>
+                      </li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <span class="page-link">Anterior</span>
+                      </li>
+                    {% endif %}
+                    {% for num in meus_processos.paginator.page_range %}
+                      {% if meus_processos.number == num %}
+                        <li class="page-item active">
+                          <span class="page-link">{{ num }}</span>
+                        </li>
+                      {% else %}
+                        <li class="page-item">
+                          <a class="page-link"
+                             href="?mp_page={{ num }}&page={{ page_obj.number }}&q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&prioridade={{ request.GET.prioridade|default:'' }}">{{ num }}</a>
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if meus_processos.has_next %}
+                      <li class="page-item">
+                        <a class="page-link"
+                           href="?mp_page={{ meus_processos.next_page_number }}&page={{ page_obj.number }}&q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&prioridade={{ request.GET.prioridade|default:'' }}">Próxima</a>
+                      </li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <span class="page-link">Próxima</span>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        <h5 class="fw-bold text-secondary mb-3">
+          <i class="bi bi-layers me-2"></i>Todos os Processos do Setor
+        </h5>
+      {% endif %}
       <div class="table-responsive">
         <table class="table align-middle">
           <thead class="table-light">
             <tr>
-              <th>Código/Rastreio</th>
-              <th>Título</th>
-              <th>Cliente</th>
+              <th style="min-width: 150px;">Código/Rastreio</th>
+              <th style="min-width: 250px;">Título</th>
+              <th style="min-width: 200px;">Cliente</th>
               <th>Status</th>
               <th>Responsável</th>
               <th class="text-center">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {% for processo in processos %}
-              <tr>
-                <td>
-                  <div class="fw-semibold">
-                    {{ processo.codigo }}
-                    <span class="badge {{ processo.get_prioridade_classe_css }} ms-1">{{ processo.get_prioridade_display }}</span>
-                  </div>
-                  <div class="text-muted small">{{ processo.codigo_rastreio|default:"-" }}</div>
-                </td>
-                <td>
-                  <div class="fw-semibold text-limit mw-300px" title="{{ processo.titulo }}">{{ processo.titulo }}</div>
-                  <div class="text-muted small text-limit mw-300px">
-                    {% for tipo in processo.tipos_amostra.all %}
-                      {{ tipo.nome }}
-                      {% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                  </div>
-                </td>
-                <td>
-                  <div class="fw-semibold text-limit mw-150px"
-                       title="{{ processo.cliente.nome }}">{{ processo.cliente.nome }}</div>
-                  <div class="text-muted small text-limit mw-150px"
-                       title="A/C: {{ processo.cliente.responsavel }}">A/C: {{ processo.cliente.responsavel }}</div>
-                </td>
-                <td>
-                  <span class="badge {{ processo.get_status_classe_css }} px-3 py-2">{{ processo.get_status_display }}</span>
-                </td>
-                <td>
-                  {% if processo.responsavel_separacao %}
-                    <div class="d-flex align-items-center">
-                      {% if processo.responsavel_separacao.foto %}
-                        <img src="{{ processo.responsavel_separacao.foto.url }}"
-                             class="rounded-circle me-2"
-                             width="24"
-                             height="24"
-                             alt="Responsável pelo Processo">
-                      {% else %}
-                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
-                             style="width: 24px;
-                                    height: 24px;
-                                    font-size: 10px">
-                          {{ processo.responsavel_separacao.first_name|first|default:"U" }}
-                        </div>
-                      {% endif %}
-                      <span class="text-limit mw-150px">{{ processo.responsavel_separacao.get_full_name|default:processo.responsavel_separacao.username }}</span>
-                    </div>
-                  {% else %}
-                    <span class="text-muted small fst-italic">--</span>
-                  {% endif %}
-                </td>
-                <td class="text-center">
-                  <div class="d-inline-flex align-items-center gap-2 text-nowrap">
-                    <a href="{% url 'samples:detalhe_processo' processo.id %}"
-                       class="text-secondary"
-                       title="Visualizar Detalhes">
-                      <i class="bi bi-eye" role="button"></i>
-                    </a>
-                    {% if not processo.is_cancelado %}
-                      {% if user.funcao == 'Separador' %}
-                        {% if not processo.responsavel_separacao %}
-                          <i class="bi bi-person-plus-fill text-primary"
-                             role="button"
-                             title="Atribuir a mim"
-                             onclick="atribuirProcesso({{ processo.id }})"></i>
-                        {% endif %}
-                        <i class="bi bi-pencil-square text-secondary"
-                           role="button"
-                           title="Alterar Status"
-                           data-bs-toggle="modal"
-                           data-bs-target="#modalAlterarStatus"
-                           data-processo-pk="{{ processo.id }}"
-                           data-processo-id="{{ processo.codigo }}"
-                           data-processo-titulo="{{ processo.titulo }}"
-                           data-processo-status="{{ processo.status }}"></i>
-                        <i class="bi bi-box text-secondary"
-                           role="button"
-                           title="Código de Rastreio"
-                           data-bs-toggle="modal"
-                           data-bs-target="#modalCodigoRastreio"
-                           data-processo-pk="{{ processo.id }}"
-                           data-processo-id="{{ processo.codigo }}"
-                           data-processo-titulo="{{ processo.titulo }}"
-                           data-processo-rastreio="{{ processo.codigo_rastreio|default:'' }}"></i>
-                      {% endif %}
-                      <i class="bi bi-chat-square-text text-secondary"
-                         role="button"
-                         title="Adicionar Comentário"
-                         data-bs-toggle="modal"
-                         data-bs-target="#modalAddComentario"
-                         data-processo-pk="{{ processo.id }}"
-                         data-processo-id="{{ processo.codigo }}"
-                         data-processo-titulo="{{ processo.titulo }}"></i>
-                    {% endif %}
-                  </div>
-                </td>
-              </tr>
+            {% for processo in page_obj %}
+              {% include "samples/includes/linha-tabela-processo.html" %}
             {% empty %}
               <tr>
-                <td colspan="5" class="text-center p-4">
+                <td colspan="6" class="text-center p-4">
                   <span class="text-muted">Nenhum processo encontrado com esses filtros.</span>
                 </td>
               </tr>
@@ -177,6 +154,46 @@
           </tbody>
         </table>
       </div>
+      {% if page_obj.paginator.num_pages > 1 %}
+        <div class="card-footer bg-white border-0 d-flex justify-content-end pt-3">
+          <nav>
+            <ul class="pagination mb-0">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link"
+                     href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&prioridade={{ request.GET.prioridade|default:'' }}">Anterior</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <span class="page-link">Anterior</span>
+                </li>
+              {% endif %}
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ num }}&q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&prioridade={{ request.GET.prioridade|default:'' }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link"
+                     href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q|default:'' }}&status={{ request.GET.status|default:'' }}&prioridade={{ request.GET.prioridade|default:'' }}">Próxima</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <span class="page-link">Próxima</span>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      {% endif %}
     </div>
   </div>
   {% include "samples/includes/modais-processos.html" %}

@@ -63,7 +63,11 @@
               <label class="form-label">Transporte</label>
               {{ processo_form.tipo_transporte }}
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" id="divCodigoCarga" style="display: none;">
+              <label class="form-label">Código da Carga</label>
+              {{ processo_form.codigo_rastreio }}
+            </div>
+            <div class="col-md-6" id="divPrioridade">
               <label class="form-label">Prioridade</label>
               {{ processo_form.prioridade }}
             </div>

@@ -266,7 +266,39 @@
               <p>{{ processo.get_tipo_transporte_display }}</p>
             </div>
             <div class="detail-item">
-              <label>Código Rastreio</label>
+              <div class="d-flex justify-content-between align-items-center">
+                <label>
+                  Código
+                  {% if processo.tipo_transporte == 'carga' %}
+                    Carga
+                  {% else %}
+                    Rastreio
+                  {% endif %}
+                </label>
+                {% if user.funcao == 'Separador' and not processo.is_cancelado %}
+                  <a href="#"
+                     class="text-primary"
+                     data-bs-toggle="modal"
+                     data-bs-target="#modalCodigoRastreio"
+                     data-processo-pk="{{ processo.id }}"
+                     data-processo-id="{{ processo.codigo }}"
+                     data-processo-titulo="{{ processo.titulo }}"
+                     data-processo-rastreio="{{ processo.codigo_rastreio|default:'' }}">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                {% elif processo.tipo_transporte == 'carga' and processo.criado_por == user and not processo.is_cancelado %}
+                  <a href="#"
+                     class="text-primary"
+                     data-bs-toggle="modal"
+                     data-bs-target="#modalCodigoRastreio"
+                     data-processo-pk="{{ processo.id }}"
+                     data-processo-id="{{ processo.codigo }}"
+                     data-processo-titulo="{{ processo.titulo }}"
+                     data-processo-rastreio="{{ processo.codigo_rastreio|default:'' }}">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                {% endif %}
+              </div>
               {% if processo.codigo_rastreio %}
                 <p class="font-monospace">{{ processo.codigo_rastreio }}</p>
               {% else %}
