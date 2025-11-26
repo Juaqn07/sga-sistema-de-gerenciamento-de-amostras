@@ -128,17 +128,23 @@ class Processo(models.Model):
 
     # Métodos auxiliares para o template (Bootstrap classes)
     def get_status_classe_css(self):
-        if self.status == 'em_separacao':
-            return 'bg-primary-subtle text-primary'
-        if self.status == 'pendente':
-            return 'bg-warning-subtle text-warning'
-        if self.status == 'entregue':
-            return 'bg-success-subtle text-success'
-        if self.status == 'nao_entregue':
-            return 'bg-danger-subtle text-danger'
-        if self.status == 'cancelado':
-            return 'bg-dark text-white'
-        return 'bg-secondary-subtle text-secondary'
+        status_map = {
+            'nao_atribuido': 'bg-secondary bg-opacity-25 text-secondary',
+
+            'atribuido': 'bg-info bg-opacity-10 text-info-emphasis',
+            'em_separacao': 'bg-primary text-white',
+
+            'pendente': 'bg-warning text-dark',
+
+            'pronto_envio': 'bg-info text-white',
+            'em_rota': 'bg-primary bg-opacity-25 text-primary-emphasis',
+
+            'entregue': 'bg-success text-white',
+            'nao_entregue': 'bg-danger text-white',
+
+            'cancelado': 'bg-dark text-white',
+        }
+        return status_map.get(self.status, 'bg-secondary')
 
     def get_prioridade_classe_css(self):
         if self.prioridade == 'alta':
