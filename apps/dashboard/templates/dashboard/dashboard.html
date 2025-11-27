@@ -1,76 +1,328 @@
 {% extends "core/base.html" %}
 {% load static %}
-
-{% block title %}Dashboard{% endblock title %}
-
+{% block title %}
+    Dashboard
+{% endblock title %}
 {% block page_css %}
-    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}"> 
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
 {% endblock page_css %}
-
 {% block content %}
-<div class="MensagemEntrada">
-    <h1>Olá, {{ user.get_full_name|default:user.username }}</h1>
-    <p>Resumo das suas atividades</p>
-</div>
-
-<div class="row g-4">
-    <div class="col-lg-4 col-md-6">
-    <div class="dashboard-card card1 h-100">
-        <div class="card-body">
-        <h5 class="card-title bi bi-file-text">Processos do Setor</h5>
-        <h1 class="card-text">{{ contagem_processos_setor }}</h1>
-        <p>Em processo</p>
-        <a href="#" class="stretched-link"></a>
-        </div>
-    </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6">
-    <div class="dashboard-card card2 h-100">
-        <div class="card-body">
-        <h5 class="card-title bi bi-clock-history">
-            Processos pendentes
-        </h5>
-        <h1 class="card-text">{{ contagem_processos_pendentes }}</h1>
-        <p>Aguardando</p>
-        <a href="#" class="stretched-link"></a>
-        </div>
-    </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6">
-    <div class="dashboard-card card3 h-100">
-        <div class="card-body">
-        <h5 class="card-title bi bi-exclamation-diamond">
-            Processos atrasados
-        </h5>
-        <h1 class="card-text">{{ contagem_processos_atrasados }}</h1>
-        <p>Em atraso</p>
-        <a href="#"  class="stretched-link"></a>
-        </div>
-    </div>
-    </div>
-</div>
-<div class="row mt-4">
-    <div class="col-12">
-    <div class="dashboard-card chart-card">
-        <div class="card-body">
-        <h5 class="h4 mb-0">Processos por Semana</h5>
-        <p class="text-muted">Últimas 6 semanas de atividade</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <canvas id="weeklyProcessChart"></canvas>
+            <h2 class="fw-bold text-dark mb-0">Visão Geral</h2>
+            <p class="text-muted small">Olá, {{ user.first_name|default:user.username }}.</p>
         </div>
+        <div class="text-end text-muted small">
+            <i class="bi bi-calendar-event me-1"></i> {% now "d \d\e F \d\e Y" %}
         </div>
     </div>
-    </div>
-</div>
+    {% if user.funcao == 'Gestor' %}
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-md-4">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-uppercase text-muted small fw-bold mb-1">Processos Ativos</p>
+                                <h2 class="fw-bold text-dark mb-0">{{ kpi_ativos }}</h2>
+                            </div>
+                            <div class="icon-box bg-primary-subtle text-primary rounded-circle">
+                                <i class="bi bi-activity"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-uppercase text-muted small fw-bold mb-1">Aguardando Atribuição</p>
+                                <h2 class="fw-bold text-dark mb-0">{{ kpi_fila }}</h2>
+                            </div>
+                            <div class="icon-box bg-warning-subtle text-warning rounded-circle">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-uppercase text-muted small fw-bold mb-1">Ocorrências</p>
+                                <h2 class="fw-bold text-dark mb-0">{{ kpi_ocorrencias }}</h2>
+                            </div>
+                            <div class="icon-box bg-danger-subtle text-danger rounded-circle">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="fw-bold mb-0">Entrada de Processos (7 Dias)</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="position: relative; height: 250px;">
+                            <canvas id="chartWeekly"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="fw-bold mb-0">Status Atual</h6>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <div class="chart-container"
+                             style="position: relative;
+                                    height: 220px;
+                                    width: 100%">
+                            <canvas id="chartStatus"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0 text-danger">
+                            <i class="bi bi-clipboard-pulse me-2"></i>Últimas Ocorrências Reportadas
+                        </h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 table-hover">
+                            <thead class="table-light small">
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Processo</th>
+                                    <th>Reportado Por</th>
+                                    <th>Mensagem</th>
+                                    <th class="text-end">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ocorrencia in lista_ocorrencias %}
+                                    <tr>
+                                        <td class="small text-muted">{{ ocorrencia.data|date:"d/m H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'samples:detalhe_processo' ocorrencia.processo.id %}"
+                                               class="fw-bold text-dark text-decoration-none">
+                                                {{ ocorrencia.processo.codigo }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if ocorrencia.autor.foto %}
+                                                    <img src="{{ ocorrencia.autor.foto.url }}"
+                                                         class="rounded-circle me-2"
+                                                         width="24"
+                                                         height="24"
+                                                         alt="Criador da ocorrência">
+                                                {% endif %}
+                                                <small>{{ ocorrencia.autor.get_full_name }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-limit mw-300px small">{{ ocorrencia.texto }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{% url 'samples:detalhe_processo' ocorrencia.processo.id %}"
+                                               class="btn btn-sm btn-light border">Ver</a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted small">Nenhuma ocorrência pendente. Ótimo trabalho!</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif user.funcao == 'Vendedor' %}
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Meus Pedidos</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-dark">Em Andamento</span>
+                            <span class="badge bg-primary-subtle text-primary fs-6">{{ meus_ativos }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="text-dark">Finalizados</span>
+                            <span class="badge bg-success-subtle text-success fs-6">{{ meus_finalizados }}</span>
+                        </div>
+                        <div class="d-grid">
+                            <a href="{% url 'samples:lista_processos' %}"
+                               class="btn btn-outline-secondary btn-sm">Ver Todos os Meus Processos</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'samples:criar_processo' %}"
+                   class="btn btn-primary w-100 py-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-plus-circle fs-4"></i>
+                    <span class="fw-bold">Novo Pedido de Amostra</span>
+                </a>
+            </div>
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="fw-bold mb-0 text-primary">
+                            <i class="bi bi-bell me-2"></i>Atualizações Recentes
+                        </h6>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for evento in ultimas_atualizacoes %}
+                            <a href="{% url 'samples:detalhe_processo' evento.processo.id %}"
+                               class="list-group-item list-group-item-action p-3">
+                                <div class="d-flex w-100 justify-content-between mb-1">
+                                    <strong class="text-dark">{{ evento.titulo }}</strong>
+                                    <small class="text-muted" style="font-size: 0.75rem;">{{ evento.data|timesince }} atrás</small>
+                                </div>
+                                <p class="mb-1 small text-secondary">{{ evento.descricao }}</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-hash"></i> {{ evento.processo.codigo }}
+                                    <span class="mx-1">•</span>
+                                    {{ evento.processo.cliente.nome }}
+                                </small>
+                            </a>
+                        {% empty %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-check2-circle fs-1 opacity-25"></i>
+                                <p class="mt-2">Nenhuma novidade recente nos seus pedidos.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif user.funcao == 'Separador' %}
+        {% if fila_espera > 0 %}
+            <div class="alert alert-warning border-warning d-flex align-items-center shadow-sm mb-4 p-3"
+                 role="alert">
+                <div class="fs-1 me-3 text-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                    <h5 class="alert-heading fw-bold mb-1">Atenção à Fila!</h5>
+                    <p class="mb-0">
+                        Existem <strong>{{ fila_espera }} processos</strong> aguardando atribuição. A equipe precisa de ajuda!
+                    </p>
+                </div>
+                <a href="{% url 'samples:lista_processos' %}?status=nao_atribuido"
+                   class="btn btn-warning ms-auto fw-bold text-dark shadow-sm">Ver Fila</a>
+            </div>
+        {% else %}
+            <div class="alert alert-success border-success d-flex align-items-center shadow-sm mb-4 p-3"
+                 role="alert">
+                <div class="fs-1 me-3 text-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div>
+                    <h5 class="alert-heading fw-bold mb-1">Fila Zerada!</h5>
+                    <p class="mb-0">Não há novos processos aguardando na fila geral. Ótimo trabalho da equipe!</p>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row g-4">
+            <div class="col-md-6">
+                {% if meus_pendentes > 0 %}
+                    <div class="card border-0 shadow-sm h-100 bg-primary text-white position-relative overflow-hidden">
+                        <i class="bi bi-box-seam position-absolute bottom-0 end-0 opacity-25"
+                           style="font-size: 8rem;
+                                  margin-right: -20px;
+                                  margin-bottom: -20px"></i>
+                        <div class="card-body p-4 position-relative">
+                            <h6 class="text-uppercase opacity-75 fw-bold mb-3">Minhas Pendências</h6>
+                            <div class="d-flex align-items-baseline">
+                                <h1 class="display-3 fw-bold mb-0">{{ meus_pendentes }}</h1>
+                                <span class="ms-2 fs-5 opacity-75">processos</span>
+                            </div>
+                            <p class="mt-2 opacity-75">Processos sob sua responsabilidade que precisam ser finalizados.</p>
+                            <div class="mt-4">
+                                <a href="{% url 'samples:lista_processos' %}?status=em_separacao"
+                                   class="btn btn-light text-primary fw-bold w-100 shadow-sm">
+                                    <i class="bi bi-play-fill me-1"></i> Continuar Trabalhando
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card border-0 shadow-sm h-100 bg-success text-white position-relative overflow-hidden">
+                        <i class="bi bi-emoji-smile position-absolute bottom-0 end-0 opacity-25"
+                           style="font-size: 8rem;
+                                  margin-right: -10px;
+                                  margin-bottom: -20px"></i>
+                        <div class="card-body p-4 position-relative d-flex flex-column justify-content-center">
+                            <h3 class="fw-bold mb-2">
+                                <i class="bi bi-stars me-2"></i>Você está em dia!
+                            </h3>
+                            <p class="fs-5 mb-0 opacity-90">Nenhum processo pendente sob sua responsabilidade.</p>
+                            <p class="mt-3 small opacity-75">Aproveite para verificar a fila geral ou adiantar outras tarefas.</p>
+                            <div class="mt-4">
+                                <a href="{% url 'samples:lista_processos' %}"
+                                   class="btn btn-light text-success fw-bold w-100 shadow-sm">
+                                    Ver Todos os Processos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="bi bi-clock-history me-2"></i>Atividade Recente dos Meus Processos
+                        </h6>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for evento in ultimas_atividades %}
+                            <div class="list-group-item py-3 border-0 border-bottom">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong class="text-dark">{{ evento.titulo }}</strong>
+                                    <small class="text-muted">{{ evento.data|date:"H:i" }}</small>
+                                </div>
+                                <small class="text-muted d-block">
+                                    Referente ao processo
+                                    <a href="{% url 'samples:detalhe_processo' evento.processo.id %}"
+                                       class="text-decoration-none fw-bold">{{ evento.processo.codigo }}</a>
+                                </small>
+                            </div>
+                        {% empty %}
+                            <div class="text-center py-5 text-muted">
+                                <p class="mb-0">Nenhuma atividade recente registrada.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock content %}
-
 {% block page_js %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    {{ chart_labels|json_script:"chartLabels" }}
-    {{ chart_data|json_script:"chartData" }}
-
-    <script src="{% static 'dashboard/js/dashboard-chart.js' %}"></script> 
+    {% if user.funcao == 'Gestor' %}
+        {{ gestor_status_labels|json_script:"statusLabels" }}
+        {{ gestor_status_data|json_script:"statusData" }}
+        {{ gestor_status_colors|json_script:"statusColors" }}
+        {{ gestor_weekly_labels|json_script:"weeklyLabels" }}
+        {{ gestor_weekly_data|json_script:"weeklyData" }}
+        <script src="{% static 'dashboard/js/dashboard-gestor.js' %}"></script>
+    {% endif %}
 {% endblock page_js %}

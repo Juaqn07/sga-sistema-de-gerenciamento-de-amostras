@@ -1,7 +1,3 @@
-
-
-/* (Todo o código de header, menu e body foi removido) */
-
 /* Mensagem de Boas-Vindas */
 .MensagemEntrada {
   padding: 0;
@@ -53,4 +49,29 @@
 .dashboard-card p {
   font-size: 1rem;
   margin: 0;
+}
+
+/* Icon Box (Círculo colorido no card) */
+.icon-box {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Card Hover Effect */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Table Hover */
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
 }
