@@ -28,11 +28,20 @@ Focado na experiência do usuário e na integridade dos dados, o SGA implementa 
 
 ## 🖥️ Visão Geral do Sistema
 
-### 📊 Dashboard Gerencial
+### 📊 Dashboards Personalizados
 Visão centralizada dos indicadores de desempenho, com contadores de status e gráficos de produtividade semanal.
 
-![Dashboard](screenshots/dashboard_geral.png)
-*(Visão do Gestor com indicadores e gráficos em desenvolvimento)*
+![Dashboard](screenshots/dashboard_gestor.png)
+*(Visão do Gestor com indicadores e gráficos)*
+
+![Dashboard](screenshots/dashboard_vendedor.png)
+*(Visão do Vendedor com última movimentação dos processos)*
+
+![Dashboard](screenshots/dashboard_separador1.png)
+*(Visão do Separador com processos pendentes)*
+
+![Dashboard](screenshots/dashboard_separador2.png)
+*(Visão do Separador com processos todos encerrados)*
 
 ---
 
