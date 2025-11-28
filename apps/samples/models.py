@@ -35,6 +35,9 @@ class Cliente(models.Model):
     def __str__(self):
         return self.nome
 
+
+# REQUISITO: Script do Banco de Dados
+# A classe abaixo define a tabela, chaves primárias (id automático) e estrangeiras
 # 3. Modelo Principal: Processo
 
 
@@ -85,6 +88,8 @@ class Processo(models.Model):
     prioridade = models.CharField(
         max_length=20, choices=PRIORIDADE_CHOICES, default='Normal')
 
+    # REQUISITO: Chaves Estrangeiras (Foreign Key)
+    # Define o relacionamento entre as tabelas Processo, Cliente e Usuário
     # Relacionamentos
     cliente = models.ForeignKey(
         Cliente, on_delete=models.PROTECT, related_name='processos')

@@ -1,3 +1,8 @@
+<!--
+REQUISITO: Include e Require (extends no Django)
+Este arquivo 'base.html' atua como cabeçalho e rodapé centralizado.
+Todas as outras páginas o "importam" usando o comando extends.
+-->
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -23,7 +28,8 @@
       <small style="color: #fff">SGA - Sistema de Gerenciamento de Amostras</small>
       <div class="menuHeader">
         <div class="dropdown">
-          <a class="btn-outline-light btn btn-secondary dropdown-toggle"
+          <a data-comentario="REQUISITO: Sessão e Nome do Usuário. O nome abaixo é consultado a partir do código do usuário armazenado na sessão atual."
+             class="btn-outline-light btn btn-secondary dropdown-toggle"
              href="#"
              role="button"
              data-bs-toggle="dropdown"

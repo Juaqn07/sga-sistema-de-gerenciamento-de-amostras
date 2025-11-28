@@ -20,6 +20,10 @@ def login_view(request):
         return redirect('dashboard:home')
 
     if request.method == 'POST':
+
+        # REQUISITO: Efetuar Login
+        # Autentica usuário e senha criptografada utilizando o banco de dados
+
         # 1. Processa os dados do formulário
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -31,6 +35,9 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
+                # REQUISITO: Sessão
+                # Cria a sessão do usuário no servidor e armazena o ID criptografado no cookie
+
                 # 4. Se o usuário for válido, loga ele
                 login(request, user)
                 # 5. Redireciona para o dashboard
@@ -48,6 +55,9 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('accounts:login')  # Redireciona para a página de login
+
+# REQUISITO: Proteção de Sessão
+# O decorator @login_required impede acesso direto sem autenticação (usado em praticamente todas as páginas)
 
 
 @login_required

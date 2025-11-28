@@ -4,7 +4,9 @@ from .models import UsuarioCustomizado
 
 
 class CustomUserCreationForm(forms.ModelForm):
-    # Campos de senha para criação
+    # REQUISITO: Validação e Sanitização - Formulário com mais de 5 campos
+    # O Django sanitiza automaticamente os dados nestes campos tipados
+
     password = forms.CharField(label='Senha', widget=forms.PasswordInput)
     confirm_password = forms.CharField(
         label='Confirmar Senha', widget=forms.PasswordInput)
@@ -21,7 +23,9 @@ class CustomUserCreationForm(forms.ModelForm):
                 {'class': 'form-control'})
 
     def clean(self):
-        # Validação para ver se as senhas batem
+        # REQUISITO: Filtro de Validação
+        # Este método valida se as senhas conferem, atuando como um filtro lógico
+
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
@@ -32,6 +36,9 @@ class CustomUserCreationForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
+        # REQUISITO: Criptografia de Senha
+        # O método set_password aplica o hash PBKDF2/SHA256 antes de salvar no banco
+
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password"])  # Criptografa a senha
         if commit:
