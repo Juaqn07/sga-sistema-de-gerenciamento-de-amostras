@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
+import dj_database_url
 from pathlib import Path
+from decouple import config, Csv
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,13 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-utzl+ul+!@2&z@tqg-^tp(a1$hc*xvgxol_&s@%knp$&9_y@*o'
+SECRET_KEY = config(
+    'SECRET_KEY', default='django-insecure-utzl+ul+!@2&z@tqg-^tp(a1$hc*xvgxol_&s@%knp$&9_y@*o')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())  # type: ignore
 
 
 # Application definition
@@ -45,12 +47,12 @@ INSTALLED_APPS = [
     'apps.dashboard',
     'apps.samples',
 
-    # Testes temporários
-    'apps.tests'
-
 ]
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -128,6 +130,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -155,4 +160,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # ---
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
+}
+
+
+# ---
+# Configurações dos Correios
+# ---
+CORREIOS_CREDENTIALS = {
+    'usuario': config('CORREIOS_USER', default=''),
+    'senha': config('CORREIOS_CODIGO_ACESSO', default=''),
+    'contrato': config('CORREIOS_CONTRATO', default=''),
+    'cartao': config('CORREIOS_CARTAO', default=''),
+    'url_base': config('CORREIOS_URL_BASE', default='https://api.correios.com.br'),
 }
