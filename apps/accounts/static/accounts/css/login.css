@@ -1,106 +1,134 @@
 /* ==========================================================================
-   STYLESHEET: LOGIN
+   STYLESHEET: TELA DE LOGIN
    ==========================================================================
-   1. Layout Geral (Background & Body)
+   1. Layout Geral (Body & Background)
    2. Cabeçalho (Header & Logo)
-   3. Container de Login (Card Central)
-   4. Elementos de Formulário (Inputs & Botões)
+   3. Componente Card de Login
+   4. Formulários & Interatividade
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. Layout Geral
+   1. Layout Geral (Body & Background)
    -------------------------------------------------------------------------- */
 body {
-  background-color: hsl(238, 82%, 15%); /* Azul escuro profundo */
+  background-color: hsl(238, 82%, 15%); /* Azul Profundo (Brand Color) */
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+
+  /* Centralização Vertical e Horizontal */
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-height: 100vh;
-  justify-content: center; /* Centraliza verticalmente */
 }
 
 /* --------------------------------------------------------------------------
-   2. Cabeçalho
+   2. Cabeçalho (Header & Logo)
    -------------------------------------------------------------------------- */
 header {
   text-align: center;
   color: #f0f0f0;
   margin-bottom: 2rem;
+  padding: 0 1rem;
 }
 
 header img {
-  max-width: 200px;
+  max-width: 150px;
   height: auto;
   margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
 }
 
-/* --------------------------------------------------------------------------
-   3. Container de Login (Card Central)
-   -------------------------------------------------------------------------- */
-/* Seletor genérico 'div' substituído por classe específica ou mantido com cuidado */
-.login-container,
-div.login-wrapper {
-  /* Caso o HTML use div pura, considere adicionar uma classe */
-  background-color: #fffcfc;
-  border-radius: 10px;
-  width: 80%;
-  max-width: 400px;
-  height: auto;
-  text-align: center;
-  margin: 0 auto; /* Centraliza horizontalmente */
-  padding: 2em;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-h1 {
+header h1 {
   font-size: 1.5rem;
-  margin-bottom: 0.5em;
-  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
-h4 {
-  margin-top: 0.2em;
+header h4 {
   font-weight: normal;
-  color: #666;
-}
-
-.container {
-  text-align: left; /* Alinha labels e inputs à esquerda */
-  padding: 0;
+  font-size: 1rem;
+  opacity: 0.8;
 }
 
 /* --------------------------------------------------------------------------
-   4. Elementos de Formulário
+   3. Componente Card de Login
    -------------------------------------------------------------------------- */
-input {
-  width: 100%;
-  box-sizing: border-box; /* Garante que padding não estoure a largura */
-  height: 40px; /* Aumentado para melhor toque */
-  padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
+/* Container principal branco */
+.login-content {
+  background-color: #ffffff;
+  border-radius: 0.625rem; /* 10px */
+  width: 90%;
+  max-width: 400px;
+  padding: 2.5rem;
+  text-align: center;
+
+  /* Sombreamento para efeito de elevação */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+
+  /* Animação suave de entrada*/
+  animation: fadeIn 0.5s ease-out;
 }
 
-input:focus {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. Formulários & Interatividade
+   -------------------------------------------------------------------------- */
+/* Inputs de Texto e Senha */
+.login-content input[type="text"],
+.login-content input[type="password"] {
+  width: 100%;
+  height: 45px;
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem; /* 6px */
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-content input[type="text"]:focus,
+.login-content input[type="password"]:focus {
   border-color: hsl(238, 82%, 30%);
   outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(45, 52, 190, 0.25);
 }
 
-input[type="submit"] {
+/* Botão de Envio */
+.login-content input[type="submit"] {
   background-color: hsl(238, 82%, 30%);
   color: white;
   border: none;
-  font-weight: bold;
+  border-radius: 0.375rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-top: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 12px;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease, transform 0.1s;
 }
 
-input[type="submit"]:hover {
-  background-color: hsl(238, 82%, 40%);
+.login-content input[type="submit"]:hover {
+  background-color: hsl(238, 82%, 20%);
+}
+
+.login-content input[type="submit"]:active {
+  transform: scale(0.98);
 }
