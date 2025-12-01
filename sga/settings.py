@@ -105,10 +105,11 @@ WSGI_APPLICATION = 'sga.wsgi.application'
 # ==============================================================================
 # Padrão: SQLite (Desenvolvimento). Em produção, recomenda-se PostgreSQL.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': config(
+        'DATABASE_URL',
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        cast=dj_database_url.parse
+    )
 }
 
 
