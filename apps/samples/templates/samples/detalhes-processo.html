@@ -48,9 +48,6 @@
             </button>
           {% endif %}
         {% endif %}
-        <button class="btn btn-outline-secondary">
-          <i class="bi bi-three-dots"></i>
-        </button>
       </div>
     </div>
     <div class="row g-4 mt-2">
@@ -317,6 +314,14 @@
             </div>
           </div>
         </div>
+        <div class="card mb-4 details-card">
+          {% if processo.tipo_transporte == "correios" and not processo.is_cancelado %}
+            <a href="{% url 'correios:api_tracking_update' processo.id %}"
+               id="btn-update-tracking"
+               class="btn btn-warning text-dark w-100"> <i class="bi bi-arrow-repeat me-1"></i> Atualizar Rastreio
+            </a>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
@@ -324,4 +329,5 @@
 {% endblock content %}
 {% block page_js %}
   <script src="{% static 'samples/js/processos-do-setor.js' %}"></script>
+  <script src="{% static 'samples/js/detalhes-processo.js' %}"></script>
 {% endblock page_js %}

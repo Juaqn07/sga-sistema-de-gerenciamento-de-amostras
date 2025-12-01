@@ -1,27 +1,34 @@
-// Variável Global para armazenar dados do cliente atual
+/**
+ * Script responsável pela página "Criar Processo".
+ * Gerencia: Busca de Clientes, Modais de Criação/Edição e Lógica de Formulário.
+ */
+
+// Variável Global: Armazena o objeto do cliente selecionado para permitir edição imediata
 let clienteAtualObj = null;
 
 document.addEventListener("DOMContentLoaded", function () {
+  // Elementos principais do DOM
   const btnSearch = document.getElementById("btn-search");
   const btnSalvarNovo = document.getElementById("btn-salvar-novo");
   const btnEditarCliente = document.getElementById("btn-editar-cliente");
   const btnSalvarEdicao = document.getElementById("btn-salvar-edicao");
 
-  function getCsrfToken() {
-    const tokenInput = document.querySelector("[name=csrfmiddlewaretoken]");
-    return tokenInput ? tokenInput.value : "";
-  }
+  // Helper para CSRF Token (Segurança Django)
+  const getCsrfToken = () =>
+    document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
 
-  // --- BUSCA ---
+  // =========================================================
+  // 1. BUSCA DE CLIENTES (AUTOCOMPLETE)
+  // =========================================================
   if (btnSearch) {
     btnSearch.addEventListener("click", function () {
       const term = document.getElementById("cliente-search").value;
-      const searchUrl = btnSearch.getAttribute("data-url");
+      const searchUrl = btnSearch.getAttribute("data-url"); // URL definida no HTML
 
-      if (term.length < 2) return;
+      if (term.length < 2) return; // Evita buscas muito curtas
 
       fetch(`${searchUrl}?term=${term}`)
-        .then((response) => response.json())
+        .then((res) => res.json())
         .then((data) => {
           const resultsDiv = document.getElementById("search-results");
           resultsDiv.innerHTML = "";
@@ -33,33 +40,50 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
           }
 
+          // Renderiza lista de resultados
           data.results.forEach((cliente) => {
             const item = document.createElement("a");
             item.className =
               "list-group-item list-group-item-action result-item";
             item.innerHTML = `<strong>${cliente.nome}</strong> <small>(${cliente.cidade}/${cliente.estado})</small>`;
-            item.onclick = function () {
-              selecionarCliente(cliente);
-            };
+
+            // Ao clicar, seleciona o cliente e esconde a busca
+            item.onclick = () => selecionarCliente(cliente);
+
             resultsDiv.appendChild(item);
           });
         });
     });
   }
 
-  // --- SALVAR NOVO ---
+  // =========================================================
+  // 2. MODAL: SALVAR NOVO CLIENTE
+  // =========================================================
   if (btnSalvarNovo) {
     btnSalvarNovo.addEventListener("click", function () {
       const form = document.getElementById("formNovoCliente");
       const createUrl = btnSalvarNovo.getAttribute("data-url");
 
+      // Validação: Impede envio se CEP estiver inválido ou campos vazios
+      const cepInput = form.querySelector('input[name="cep"]');
+      if (cepInput && cepInput.classList.contains("is-invalid")) {
+        alert("CEP Inválido. Corrija para prosseguir.");
+        return;
+      }
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
 
+      // UX: Feedback visual no botão
+      const originalText = this.innerHTML;
+      this.innerHTML =
+        '<span class="spinner-border spinner-border-sm"></span> Salvando...';
+      this.disabled = true;
+
+      // Envio AJAX
       const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
+      const payload = Object.fromEntries(formData.entries());
 
       fetch(createUrl, {
         method: "POST",
@@ -67,52 +91,68 @@ document.addEventListener("DOMContentLoaded", function () {
           "Content-Type": "application/json",
           "X-CSRFToken": getCsrfToken(),
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
         .then((r) => r.json())
         .then((result) => {
+          this.innerHTML = originalText;
+          this.disabled = false;
+
           if (result.status === "success") {
+            // Sucesso: Fecha modal, seleciona cliente e limpa form
             bootstrap.Modal.getInstance(
               document.getElementById("modalNovoCliente")
             ).hide();
             selecionarCliente(result.cliente);
-            form.reset(); // Limpa o form para a próxima
+            form.reset();
+            form
+              .querySelectorAll(".is-valid, .is-invalid")
+              .forEach((el) => el.classList.remove("is-valid", "is-invalid"));
+            form.querySelector(".cep-status").innerHTML = "";
           } else {
             alert("Erro: " + result.message);
           }
+        })
+        .catch(() => {
+          this.innerHTML = originalText;
+          this.disabled = false;
+          alert("Erro de comunicação com o servidor.");
         });
     });
   }
 
-  // --- ABRIR EDIÇÃO ---
+  // =========================================================
+  // 3. EDITAR CLIENTE SELECIONADO
+  // =========================================================
+
+  // Abre o modal preenchendo os dados
   if (btnEditarCliente) {
     btnEditarCliente.addEventListener("click", function () {
       if (!clienteAtualObj) return;
 
-      // Preenche o formulário de edição com os dados da memória
-      document.getElementById("edit-id").value = clienteAtualObj.id;
-      document.getElementById("edit-nome").value = clienteAtualObj.nome;
-      document.getElementById("edit-responsavel").value =
-        clienteAtualObj.responsavel;
-      document.getElementById("edit-cep").value = clienteAtualObj.cep || "";
-      document.getElementById("edit-logradouro").value =
-        clienteAtualObj.logradouro;
-      document.getElementById("edit-numero").value = clienteAtualObj.numero;
-      document.getElementById("edit-bairro").value = clienteAtualObj.bairro;
-      document.getElementById("edit-complemento").value =
-        clienteAtualObj.complemento || "";
-      document.getElementById("edit-cidade").value = clienteAtualObj.cidade;
-      document.getElementById("edit-estado").value = clienteAtualObj.estado;
+      // Preenche os campos do modal de edição com os dados da memória
+      const fields = [
+        "id",
+        "nome",
+        "responsavel",
+        "cep",
+        "logradouro",
+        "numero",
+        "bairro",
+        "complemento",
+        "cidade",
+        "estado",
+      ];
+      fields.forEach((field) => {
+        const el = document.getElementById(`edit-${field}`);
+        if (el) el.value = clienteAtualObj[field] || "";
+      });
 
-      // Abre o modal
-      const modal = new bootstrap.Modal(
-        document.getElementById("modalEditarCliente")
-      );
-      modal.show();
+      new bootstrap.Modal(document.getElementById("modalEditarCliente")).show();
     });
   }
 
-  // --- SALVAR EDIÇÃO ---
+  // Salva a edição
   if (btnSalvarEdicao) {
     btnSalvarEdicao.addEventListener("click", function () {
       const form = document.getElementById("formEditarCliente");
@@ -125,7 +165,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
 
       fetch(editUrl, {
         method: "POST",
@@ -133,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "Content-Type": "application/json",
           "X-CSRFToken": getCsrfToken(),
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(Object.fromEntries(formData.entries())),
       })
         .then((r) => r.json())
         .then((result) => {
@@ -141,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
             bootstrap.Modal.getInstance(
               document.getElementById("modalEditarCliente")
             ).hide();
-            // Atualiza a tela com os dados novos que voltaram do servidor
+            // Atualiza a visualização do card com os novos dados
             selecionarCliente(result.cliente);
           } else {
             alert("Erro ao editar: " + result.message);
@@ -149,33 +188,89 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
   }
+
+  // =========================================================
+  // 4. INTEGRAÇÃO COM BUSCA-CEP.JS
+  // =========================================================
+  // Verifica se a função existe antes de chamar
+  if (typeof setupCepAutocomplete === "function") {
+    // Mapeamento para o Modal Novo
+    setupCepAutocomplete(
+      '#formNovoCliente input[name="cep"]',
+      {
+        logradouro: '#formNovoCliente input[name="logradouro"]',
+        bairro: '#formNovoCliente input[name="bairro"]',
+        cidade: '#formNovoCliente input[name="cidade"]',
+        estado: '#formNovoCliente input[name="estado"]',
+        numero: '#formNovoCliente input[name="numero"]',
+      },
+      "#btn-salvar-novo"
+    );
+
+    // Mapeamento para o Modal Editar
+    setupCepAutocomplete(
+      '#formEditarCliente input[name="cep"]',
+      {
+        logradouro: '#formEditarCliente input[name="logradouro"]',
+        bairro: '#formEditarCliente input[name="bairro"]',
+        cidade: '#formEditarCliente input[name="cidade"]',
+        estado: '#formEditarCliente input[name="estado"]',
+        numero: '#formEditarCliente input[name="numero"]',
+      },
+      "#btn-salvar-edicao"
+    );
+  }
+
+  // =========================================================
+  // 5. UX: CAMPO CONDICIONAL (TIPO TRANSPORTE)
+  // =========================================================
+  const selectTransporte = document.getElementById("id_tipo_transporte");
+  const divCodigoCarga = document.getElementById("divCodigoCarga");
+
+  if (selectTransporte && divCodigoCarga) {
+    function checkTransporte() {
+      // Exibe campo extra apenas se for 'Carga'
+      const isCarga = selectTransporte.value === "carga";
+      divCodigoCarga.style.display = isCarga ? "block" : "none";
+
+      // Limpa valor se esconder para evitar envio de dados sujos
+      if (!isCarga) {
+        const input = divCodigoCarga.querySelector("input");
+        if (input) input.value = "";
+      }
+    }
+    selectTransporte.addEventListener("change", checkTransporte);
+    checkTransporte(); // Inicialização
+  }
 });
 
-// --- FUNÇÕES GLOBAIS ---
+// --- FUNÇÕES AUXILIARES GLOBAIS ---
 
+/**
+ * Atualiza a interface com os dados do cliente selecionado.
+ * Esconde a área de busca e mostra o card de resumo.
+ * @param {object} cliente - Objeto cliente retornado pela API.
+ */
 function selecionarCliente(cliente) {
-  // 1. Salva na variável global para edição posterior
-  clienteAtualObj = cliente;
+  clienteAtualObj = cliente; // Persiste globalmente
 
-  // 2. Atualiza Interface
+  // Alterna visibilidade
   document.getElementById("area-busca").classList.add("d-none");
   document
     .getElementById("card-cliente-selecionado")
     .classList.remove("d-none");
 
+  // Preenche Card
   document.getElementById("card-nome").innerText = cliente.nome;
   document.getElementById("card-ac").innerText = cliente.responsavel;
 
-  // Formata endereço
-  let enderecoCompleto = cliente.endereco_completo; // Se vier da API de Create/Edit
-  if (!enderecoCompleto) {
-    // Se vier da API de Busca (que retorna campos separados)
-    enderecoCompleto = `${cliente.logradouro}, ${cliente.numero} - ${cliente.cidade}/${cliente.estado}`;
-  }
-  document.getElementById("card-endereco").innerText = enderecoCompleto;
+  const endereco =
+    cliente.endereco_completo ||
+    `${cliente.logradouro}, ${cliente.numero} - ${cliente.cidade}/${cliente.estado}`;
+  document.getElementById("card-endereco").innerText = endereco;
   document.getElementById("card-cep").innerText = cliente.cep;
 
-  // 3. Preenche Input Oculto
+  // Preenche Input Oculto (CRÍTICO: Isso é o que o Django recebe no POST)
   document.getElementById("selected_cliente_id").value = cliente.id;
 }
 
@@ -186,29 +281,4 @@ function limparCliente() {
   document.getElementById("selected_cliente_id").value = "";
   document.getElementById("cliente-search").value = "";
   document.getElementById("search-results").classList.add("d-none");
-}
-
-// --- LÓGICA TIPO TRANSPORTE (CARGA) ---
-const selectTransporte = document.getElementById("id_tipo_transporte"); // ID padrão do Django
-const divCodigoCarga = document.getElementById("divCodigoCarga");
-
-if (selectTransporte && divCodigoCarga) {
-  // Função para verificar o estado atual
-  function checkTransporte() {
-    if (selectTransporte.value === "carga") {
-      // Valor deve ser minúsculo conforme o models.py choices
-      divCodigoCarga.style.display = "block";
-    } else {
-      divCodigoCarga.style.display = "none";
-      // Limpa o campo se mudar de ideia, para não salvar lixo
-      const inputCarga = divCodigoCarga.querySelector("input");
-      if (inputCarga) inputCarga.value = "";
-    }
-  }
-
-  // Ouve mudanças
-  selectTransporte.addEventListener("change", checkTransporte);
-
-  // Roda ao carregar (caso tenha voltado de um erro de validação)
-  checkTransporte();
 }

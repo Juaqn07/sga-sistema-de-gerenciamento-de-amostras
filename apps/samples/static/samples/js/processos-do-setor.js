@@ -1,122 +1,148 @@
-/* =================================================== */
-/* JAVASCRIPT DA PÁGINA PROCESSOS DO SETOR             */
-/* =================================================== */
+/**
+ * Script principal do Dashboard (Lista de Processos).
+ * Gerencia:
+ * 1. Modais de ação (Status, Rastreio, Comentário).
+ * 2. Funções globais de ação (Atribuir, Cancelar).
+ * 3. Comunicação AJAX com as APIs do backend.
+ */
 
-// Variável para guardar o ID do processo que está no modal aberto
-let processoPkAtual = null;
+// Variável Global: Armazena o ID do processo que está sendo manipulado no modal aberto.
+let processoIdSelecionado = null;
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Função para pegar CSRF
+  // --- HELPER: Obtém o Token CSRF do Django ---
   function getCsrfToken() {
-    // Tenta pegar do input (se houver form na página) ou cookie
     const input = document.querySelector("[name=csrfmiddlewaretoken]");
-    if (input) return input.value;
-    return "";
+    return input ? input.value : "";
   }
 
-  // Função Genérica de Fetch
-  function sendData(url, data) {
+  // --- HELPER: Envio Genérico de Dados (AJAX) ---
+  function sendApiRequest(url, payload) {
     fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": getCsrfToken(),
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     })
-      .then((r) => r.json())
+      .then((response) => response.json())
       .then((result) => {
         if (result.status === "success") {
-          // Recarrega a página para mostrar o novo status/rastreio
+          // Sucesso: Recarrega a página para refletir mudanças
           window.location.reload();
         } else {
-          alert("Erro: " + (result.message || "Erro desconhecido"));
+          alert("Erro: " + (result.message || "Ocorreu um erro desconhecido."));
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error("Erro de rede:", err);
+        alert("Erro de comunicação com o servidor.");
+      });
   }
 
-  // --- LÓGICA DE ABERTURA DOS MODAIS (Preencher dados) ---
+  // =========================================================
+  // 1. CONFIGURAÇÃO DOS MODAIS (EVENTO 'SHOW')
+  // =========================================================
+  // Preenche os dados dentro do modal antes dele aparecer na tela
   const modais = document.querySelectorAll(".modal");
+
   modais.forEach((modalEl) => {
     modalEl.addEventListener("show.bs.modal", function (event) {
-      const button = event.relatedTarget;
-      if (!button) return; // Se foi aberto via JS, ignora
+      const button = event.relatedTarget; // Botão que acionou o modal
+      if (!button) return;
 
-      // Pega os dados do botão
+      // Extrai dados dos atributos data-* do botão HTML
       const pk = button.getAttribute("data-processo-pk");
       const codigo = button.getAttribute("data-processo-id");
       const titulo = button.getAttribute("data-processo-titulo");
 
-      // Salva PK globalmente
-      processoPkAtual = pk;
+      // Atualiza a variável global
+      processoIdSelecionado = pk;
 
-      // Atualiza Título do Modal
+      // Monta o texto de cabeçalho (Ex: "PRC-2025-001 - Amostra X")
       const infoText = `${codigo} - ${titulo}`;
 
-      // Lógica específica de cada modal
+      // Lógica específica para cada tipo de modal
       if (modalEl.id === "modalAlterarStatus") {
         modalEl.querySelector("#modalProcessoInfo").textContent = infoText;
+        // Pré-seleciona o status atual
         const statusAtual = button.getAttribute("data-processo-status");
         modalEl.querySelector("#modalSelectStatus").value = statusAtual;
       } else if (modalEl.id === "modalCodigoRastreio") {
         modalEl.querySelector("#modalRastreioInfo").textContent = infoText;
+        // Preenche código atual se existir
         const rastreioAtual = button.getAttribute("data-processo-rastreio");
         modalEl.querySelector("#modalRastreioInput").value =
           rastreioAtual || "";
       } else if (modalEl.id === "modalAddComentario") {
         modalEl.querySelector("#modalComentarioInfo").textContent = infoText;
+        // Limpa campos anteriores
         modalEl.querySelector("#modalComentarioTextarea").value = "";
         modalEl.querySelector("#fluxoGestao").checked = false;
       }
     });
   });
 
-  // --- LISTENERS DOS BOTÕES DE SALVAR ---
+  // =========================================================
+  // 2. LISTENERS DOS BOTÕES "SALVAR" NOS MODAIS
+  // =========================================================
 
-  // 1. Salvar Status
+  // A. Salvar Status
   const btnStatus = document.getElementById("btnSalvarStatus");
   if (btnStatus) {
     btnStatus.addEventListener("click", function () {
       const novoStatus = document.getElementById("modalSelectStatus").value;
-      const url = `/processos/api/processo/${processoPkAtual}/status/`;
-      sendData(url, { status: novoStatus });
+      const url = `/processos/api/processo/${processoIdSelecionado}/status/`;
+      sendApiRequest(url, { status: novoStatus });
     });
   }
 
-  // 2. Salvar Rastreio
+  // B. Salvar Rastreio (Carga ou Correios)
   const btnRastreio = document.getElementById("btnSalvarRastreio");
   if (btnRastreio) {
     btnRastreio.addEventListener("click", function () {
       const codigo = document.getElementById("modalRastreioInput").value;
-      const url = `/processos/api/processo/${processoPkAtual}/rastreio/`;
-      sendData(url, { codigo_rastreio: codigo });
+      const url = `/processos/api/processo/${processoIdSelecionado}/rastreio/`;
+      sendApiRequest(url, { codigo_rastreio: codigo });
     });
   }
 
-  // 3. Salvar Comentário
+  // C. Salvar Comentário / Ocorrência
   const btnComentario = document.getElementById("btnSalvarComentario");
   if (btnComentario) {
     btnComentario.addEventListener("click", function () {
       const texto = document.getElementById("modalComentarioTextarea").value;
-      const gestao = document.getElementById("fluxoGestao").checked;
-      const url = `/processos/api/processo/${processoPkAtual}/comentario/`;
-      sendData(url, { texto: texto, encaminhar_gestao: gestao });
+      const encaminharGestao = document.getElementById("fluxoGestao").checked;
+
+      const url = `/processos/api/processo/${processoIdSelecionado}/comentario/`;
+      sendApiRequest(url, {
+        texto: texto,
+        encaminhar_gestao: encaminharGestao,
+      });
     });
   }
 });
 
+// =========================================================
+// 3. FUNÇÕES GLOBAIS (ACIONADAS DIRETAMENTE NO HTML)
+// =========================================================
+
+/**
+ * Acionado pelo botão "Atribuir a mim".
+ * Define o usuário logado como responsável pela separação.
+ * @param {number} pk - ID do processo.
+ */
 function atribuirProcesso(pk) {
   if (!confirm("Deseja assumir a responsabilidade por este processo?")) return;
 
-  // Pega o token (reutilizando a função que já existe ou criando uma nova instância)
-  const token = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
   fetch(`/processos/api/processo/${pk}/atribuir/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": token,
+      "X-CSRFToken": csrfToken,
     },
     body: JSON.stringify({}),
   })
@@ -125,27 +151,37 @@ function atribuirProcesso(pk) {
       if (result.status === "success") {
         window.location.reload();
       } else {
-        alert("Erro: " + result.message);
+        alert("Erro ao atribuir: " + result.message);
       }
     })
     .catch((err) => console.error(err));
 }
 
+/**
+ * Acionado pelos botões de Cancelar ou Reativar.
+ * @param {number} pk - ID do processo.
+ * @param {string} acao - Tipo de ação: 'cancelar' ou 'reativar'.
+ */
 function toggleCancelar(pk, acao) {
-  const mensagem =
-    acao === "cancelar"
-      ? "Tem certeza que deseja CANCELAR este processo?\n\nNinguém poderá mais alterá-lo ou adicionar anexos."
-      : "Deseja REATIVAR este processo?\n\nEle voltará para a fila 'Não Atribuído' e ficará disponível para separação.";
+  let mensagem = "";
+
+  if (acao === "cancelar") {
+    mensagem =
+      "Tem certeza que deseja CANCELAR este processo?\n\nNinguém poderá mais alterá-lo ou adicionar anexos.";
+  } else {
+    mensagem =
+      "Deseja REATIVAR este processo?\n\nEle voltará para a fila 'Não Atribuído' e ficará disponível para separação.";
+  }
 
   if (!confirm(mensagem)) return;
 
-  const token = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
   fetch(`/processos/api/processo/${pk}/cancelar/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": token,
+      "X-CSRFToken": csrfToken,
     },
     body: JSON.stringify({}),
   })

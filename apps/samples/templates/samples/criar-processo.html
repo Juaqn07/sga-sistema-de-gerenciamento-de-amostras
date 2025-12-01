@@ -257,6 +257,13 @@
               <div class="col-md-6 mb-3">
                 <label class="form-label">CEP</label>
                 <input type="text" class="form-control" name="cep" id="edit-cep">
+                <div class="form-text">
+                  <a href="https://buscacepinter.correios.com.br/app/endereco/index.php"
+                     target="_blank"
+                     class="text-decoration-none small">
+                    <i class="bi bi-box-arrow-up-right"></i> Não sei o CEP
+                  </a>
+                </div>
               </div>
             </div>
             <div class="row">
@@ -324,5 +331,6 @@
   </div>
 {% endblock content %}
 {% block page_js %}
+  <script src="{% static 'samples/js/busca-cep.js' %}"></script>
   <script src="{% static 'samples/js/criar-processo.js' %}"></script>
 {% endblock page_js %}
