@@ -1,3 +1,3 @@
 from django.contrib import admin
 
-# Register your models here.
+# Sem modelos para registrar no Painel Admin neste app.

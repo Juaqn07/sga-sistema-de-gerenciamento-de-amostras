@@ -2,20 +2,23 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import UsuarioCustomizado
 
-# Define um "admin model" customizado
-
 
 class UsuarioCustomizadoAdmin(UserAdmin):
-    # O 'fieldsets' padrão do UserAdmin, mais os nossos campos
+    """
+    Configuração do Painel Admin para suportar o modelo de usuário customizado.
+    Estende o UserAdmin padrão para incluir os campos 'funcao' e 'setor' nas telas de edição.
+    """
+
+    # Adiciona os campos customizados na tela de EDICÃO de usuário existente
     fieldsets = UserAdmin.fieldsets + (
-        # Adiciona 'setor' junto com 'funcao'
         ('Campos Customizados', {'fields': ('funcao', 'setor')}),
-    )  # type: ignore
-    # O 'add_fieldsets' é para a tela de *criação* de usuário
+    )
+
+    # Adiciona os campos customizados na tela de CRIAÇÃO de novo usuário
     add_fieldsets = UserAdmin.add_fieldsets + (
         ('Campos Customizados', {'fields': ('funcao', 'setor')}),
-    )  # type: ignore
+    )
 
 
-# Registra o nosso modelo customizado com a nossa classe customizada
+# Registra o modelo customizado
 admin.site.register(UsuarioCustomizado, UsuarioCustomizadoAdmin)

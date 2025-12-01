@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+# NOTA:
+# Este app não possui views próprias.
+# As páginas são renderizadas pelos apps específicos que estendem o 'base.html'.

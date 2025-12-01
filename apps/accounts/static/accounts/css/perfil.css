@@ -1,53 +1,71 @@
-/* ================================================= */
-/* ESTILOS ESPECÍFICOS: Perfil                       */
-/* ================================================= */
+/* ==========================================================================
+   STYLESHEET: PERFIL DO USUÁRIO
+   ==========================================================================
+   1. Títulos & Tipografia
+   2. Card de Visualização (Avatar & Dados)
+   3. Formulário de Edição
+   ========================================================================== */
 
-/* Estilos de título específicos da página de perfil */
+/* --------------------------------------------------------------------------
+   1. Títulos & Tipografia
+   -------------------------------------------------------------------------- */
 h3 {
   color: var(--cor-principal);
   margin-bottom: 1rem;
   font-size: 2rem;
+  font-weight: 600;
 }
 
+/* --------------------------------------------------------------------------
+   2. Card de Visualização
+   -------------------------------------------------------------------------- */
 .card {
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
   min-width: 50px;
+  border: none; /* Remove borda padrão do Bootstrap */
 }
 
+/* Avatar do Usuário */
 .card img.rounded-circle {
   width: 150px;
   height: 150px;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid var(--cor-principal);
-}
-
-/* REMOVIDAS as regras .row, .col-md-4, e .col-md-8
-  que quebravam a responsividade do Bootstrap.
-*/
-
-form .form-label {
-  font-weight: 600;
-}
-
-form .form-control {
-  border-radius: 0.25rem;
-}
-
-form .d-flex.gap-2 {
-  margin-top: 1rem;
-}
-
-form .btn {
-  min-width: 100px;
+  border: 4px solid var(--cor-principal); /* Borda destacada */
+  padding: 3px; /* Espaço entre foto e borda */
+  background-color: #fff;
 }
 
 .card h5 {
   margin-bottom: 0.25rem;
+  font-weight: bold;
+  color: #333;
 }
 
 .card p {
   margin-bottom: 0.25rem;
-  color: #555;
+  color: #6c757d;
+}
+
+/* --------------------------------------------------------------------------
+   3. Formulário de Edição
+   -------------------------------------------------------------------------- */
+form .form-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+form .form-control {
+  border-radius: 0.25rem;
+  padding: 0.6rem 0.75rem; /* Input mais alto */
+}
+
+/* Espaçamento para botões de ação */
+form .d-flex.gap-2 {
+  margin-top: 1.5rem;
+}
+
+form .btn {
+  min-width: 120px;
 }

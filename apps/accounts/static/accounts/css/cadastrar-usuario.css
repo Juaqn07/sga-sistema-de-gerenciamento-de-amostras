@@ -1,31 +1,35 @@
-/* ================================================= */
-/* ESTILOS ESPECÍFICOS: Cadastrar Usuário            */
-/* ================================================= */
+/* ==========================================================================
+   STYLESHEET: CADASTRAR / GERENCIAR USUÁRIOS
+   ==========================================================================
+   1. Cabeçalho da Página
+   2. Formulário de Cadastro (Esquerda)
+   3. Lista de Usuários Cadastrados (Direita)
+   4. Responsividade & Flexbox
+   ========================================================================== */
 
-/* (Todo o código de header, menu, body, .titulo-descricao (layout) e .cards-wrapper (layout) foi removido) */
-
-
-/* Estilos de texto dentro do título */
+/* --------------------------------------------------------------------------
+   1. Cabeçalho da Página
+   -------------------------------------------------------------------------- */
 .titulo-descricao h4 {
   font-size: 2rem;
   margin-bottom: 0.3125rem; /* 5px */
+  color: #333;
 }
 
 .titulo-descricao small {
-  font-size: 0.875rem; 
-  color: #555;
+  font-size: 0.875rem;
+  color: #6c757d;
 }
 
-/* css para o formulário de cadastro de usuário */
+/* --------------------------------------------------------------------------
+   2. Formulário de Cadastro
+   -------------------------------------------------------------------------- */
 .formulario-cadastro {
   background-color: #fff;
-  border-radius: 0.5rem; 
+  border-radius: 0.5rem;
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-  /* margin-left: 17rem; (Removido, o .cards-wrapper cuida disso) */
-  /* margin-top: 6rem; (Removido, o .titulo-descricao cuida disso) */
   padding: 1.5rem;
-  max-width: 40rem; 
-  width: calc(100% - 18rem);
+
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -33,9 +37,11 @@
 }
 
 .formulario-cadastro h3 {
-  color: var(--cor-principal); /* <-- Usando a variável global! */
+  color: var(--cor-principal);
   margin-bottom: 1rem;
   font-size: 1.4rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
 }
 
 .formulario-cadastro .form-label {
@@ -46,35 +52,39 @@
 
 .formulario-cadastro .form-control,
 .formulario-cadastro .form-select {
-  border: 1px solid #ccc;
+  border: 1px solid #ced4da;
   border-radius: 0.375rem;
   font-size: 1rem;
   padding: 0.5rem 0.75rem;
 }
 
+/* Botão Salvar (Verde) */
 .formulario-cadastro button[type="submit"] {
-background-color: #28a745; 
-border: none;
-padding: 0.5rem 0.75rem;
-font-size: 1rem;
-width: 100%; 
-box-sizing: border-box;
-transition: background-color 0.2s ease-in-out;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  width: 100%;
+  transition: background-color 0.2s ease-in-out;
+  font-weight: 500;
+  margin-top: 1rem;
 }
+
 .formulario-cadastro button[type="submit"]:hover {
   background-color: #218838;
 }
 
-/* CSS para o card de Usuários Cadastrados */
+/* --------------------------------------------------------------------------
+   3. Lista de Usuários Cadastrados (Card Lateral)
+   -------------------------------------------------------------------------- */
 .usuarios-cadastrados-card {
   background-color: #fff;
-  border-radius: 0.5rem; /* 8px */
-  box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1);
-  /* margin-left: 17rem; (Removido) */
-  /* margin-top: 6rem; (Removido) */
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
-  max-width: 25rem; /* largura menor para caber ao lado do outro card */
-  width: calc(100% - 18rem);
+
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -82,55 +92,77 @@ transition: background-color 0.2s ease-in-out;
 }
 
 .usuarios-cadastrados-card h3 {
-  color: var(--cor-principal); /* <-- Usando a variável global! */
+  color: var(--cor-principal);
   margin-bottom: 1rem;
-  font-size: 1.75rem;
+  font-size: 1.4rem; /* Ajustado para igualar o form */
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
 }
 
+/* Item Individual da Lista */
 .lista-usuarios .usuario {
   background-color: #f8f9fa;
-  border: 0.0625rem solid #ddd;
+  border: 1px solid #dee2e6;
   border-radius: 0.375rem;
-  padding: 0.75rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .lista-usuarios .usuario label {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 1rem;
+  color: #343a40;
 }
 
 .lista-usuarios .usuario small {
   font-size: 0.875rem;
-  color: #555;
+  color: #6c757d;
 }
 
+/* Botão Excluir (Vermelho) */
 .usuarios-cadastrados-card button[type="button"] {
-  background-color: #dc3545; /* vermelho para excluir */
+  background-color: #dc3545;
+  color: white;
   border: none;
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
+  border-radius: 0.375rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
   width: 100%;
-  box-sizing: border-box;
   transition: background-color 0.2s ease-in-out;
+  margin-top: 0.5rem;
 }
 
 .usuarios-cadastrados-card button[type="button"]:hover {
   background-color: #c82333;
 }
 
-/* Ajustes de flexbox do .cards-wrapper (já que a margem foi movida para o layout.css) */
+/* --------------------------------------------------------------------------
+   4. Responsividade & Flexbox Wrapper
+   -------------------------------------------------------------------------- */
+/* Ajustes para o container pai flexível (.cards-wrapper no HTML) */
 .formulario-cadastro,
 .usuarios-cadastrados-card {
-  flex: 1 1 auto; /* flexível, respeitando max-width */
-  max-width: 40rem; /* form mantém tamanho */
-  box-sizing: border-box;
-  margin-left: 0; /* remove margin-left que atrapalhava */
+  flex: 1 1 auto;
+  margin-left: 0;
+}
+
+.formulario-cadastro {
+  max-width: 40rem; /* Formulário mais largo */
+  width: 100%;
 }
 
 .usuarios-cadastrados-card {
-  max-width: 25rem; /* menor que o form */
-  margin-left: 0; /* remove margin-left que atrapalhava */
+  max-width: 25rem; /* Lista lateral mais estreita */
+  width: 100%;
+}
+
+/* Em telas pequenas, empilha */
+@media (max-width: 992px) {
+  .formulario-cadastro,
+  .usuarios-cadastrados-card {
+    max-width: 100%;
+  }
 }

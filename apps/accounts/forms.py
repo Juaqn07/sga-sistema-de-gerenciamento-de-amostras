@@ -1,11 +1,15 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import UsuarioCustomizado
 
 
 class CustomUserCreationForm(forms.ModelForm):
-    # REQUISITO: Validação e Sanitização - Formulário com mais de 5 campos
-    # O Django sanitiza automaticamente os dados nestes campos tipados
+    """
+    Formulário para CRIAÇÃO de novos usuários (Gestão).
+
+    REQUISITOS ATENDIDOS:
+    1. Validação e Sanitização (Clean method).
+    2. Criptografia de Senha (Save method).
+    """
 
     password = forms.CharField(label='Senha', widget=forms.PasswordInput)
     confirm_password = forms.CharField(
@@ -17,15 +21,17 @@ class CustomUserCreationForm(forms.ModelForm):
                   'password', 'confirm_password', 'funcao', 'setor')
 
     def __init__(self, *args, **kwargs):
+        """Inicializa o form aplicando classes Bootstrap em todos os campos."""
         super().__init__(*args, **kwargs)
         for field_name in self.fields:
             self.fields[field_name].widget.attrs.update(
                 {'class': 'form-control'})
 
     def clean(self):
-        # REQUISITO: Filtro de Validação
-        # Este método valida se as senhas conferem, atuando como um filtro lógico
-
+        """
+        REQUISITO: Filtro de Validação
+        Valida se os campos de senha e confirmação de senha são idênticos.
+        """
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
@@ -36,22 +42,33 @@ class CustomUserCreationForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
-        # REQUISITO: Criptografia de Senha
-        # O método set_password aplica o hash PBKDF2/SHA256 antes de salvar no banco
-
+        """
+        REQUISITO: Criptografia de Senha
+        Intercepta o salvamento para aplicar o hash (PBKDF2) na senha antes de ir ao banco.
+        """
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])  # Criptografa a senha
+
+        # O método set_password faz o hash seguro
+        user.set_password(self.cleaned_data["password"])
+
         if commit:
             user.save()
         return user
 
 
 class CustomUserChangeForm(forms.ModelForm):
-    # Campos de redefinição de senha (OPCIONAIS)
+    """
+    Formulário para EDIÇÃO de usuários existentes.
+    Permite alteração de dados cadastrais e troca opcional de senha.
+    """
+
+    # Campos de senha são opcionais na edição
     password = forms.CharField(
-        label='Nova Senha (Opcional)', widget=forms.PasswordInput, required=False)
+        label='Nova Senha (Opcional)', widget=forms.PasswordInput, required=False
+    )
     confirm_password = forms.CharField(
-        label='Confirmar Nova Senha', widget=forms.PasswordInput, required=False)
+        label='Confirmar Nova Senha', widget=forms.PasswordInput, required=False
+    )
 
     class Meta:
         model = UsuarioCustomizado
@@ -59,20 +76,26 @@ class CustomUserChangeForm(forms.ModelForm):
                   'email', 'funcao', 'setor', 'is_active')
 
     def __init__(self, *args, **kwargs):
+        """Configura widgets e placeholders para edição."""
         super().__init__(*args, **kwargs)
+
         for field_name in self.fields:
+            widget = self.fields[field_name].widget
+
+            # Checkbox tem classe diferente no Bootstrap
             if field_name == 'is_active':
-                self.fields[field_name].widget.attrs.update(
-                    {'class': 'form-check-input'})
+                widget.attrs.update({'class': 'form-check-input'})
+            # Campos de senha recebem placeholder explicativo
             elif field_name in ('password', 'confirm_password'):
-                self.fields[field_name].widget.attrs.update(
-                    {'class': 'form-control', 'placeholder': 'Deixe em branco para não alterar'})
+                widget.attrs.update({
+                    'class': 'form-control',
+                    'placeholder': 'Deixe em branco para não alterar'
+                })
             else:
-                self.fields[field_name].widget.attrs.update(
-                    {'class': 'form-control'})
+                widget.attrs.update({'class': 'form-control'})
 
     def clean(self):
-        # Validação para ver se as senhas batem (se foram preenchidas)
+        """Valida igualdade de senhas apenas se o usuário tentou alterá-las."""
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
@@ -83,13 +106,13 @@ class CustomUserChangeForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
-        # Salva o usuário normal
+        """Salva alterações, atualizando a senha apenas se fornecida."""
         user = super().save(commit=False)
 
-        # Se o campo de senha foi preenchido, atualiza a senha
+        # Verifica se houve entrada de nova senha
         password = self.cleaned_data.get("password")
         if password:
-            user.set_password(password)  # Criptografa
+            user.set_password(password)
 
         if commit:
             user.save()

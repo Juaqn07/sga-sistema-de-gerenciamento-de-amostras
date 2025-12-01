@@ -1,10 +1,11 @@
 from django.urls import path
-from . import views  # Importa as views do app
+from . import views
 
-app_name = 'dashboard'  # Para o {% url 'dashboard:home' %}
+# Namespace para referenciar urls no template: {% url 'dashboard:home' %}
+app_name = 'dashboard'
 
 urlpatterns = [
-    # URL: /dashboard/
-    # O prefixo 'dashboard/' já estará no urls.py principal
+    # Rota Principal (Dashboard)
+    # Acessível em: /dashboard/ (configurado no urls.py raiz do projeto)
     path('', views.dashboard_view, name='home'),
 ]

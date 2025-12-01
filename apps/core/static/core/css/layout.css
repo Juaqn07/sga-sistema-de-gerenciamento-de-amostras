@@ -1,17 +1,26 @@
-/* ================================================= */
-/* ARQUIVO BASE DE LAYOUT (NOVO)                     */
-/* Contém todos os estilos globais e compartilhados  */
-/* ================================================= */
+/* ==========================================================================
+   STYLESHEET: LAYOUT GLOBAL (CORE)
+   ==========================================================================
+   1. Variáveis & Reset (Root)
+   2. Estrutura Base (HTML/Body)
+   3. Cabeçalho (Header)
+   4. Navegação Lateral (Sidebar/Aside)
+   5. Containers de Conteúdo
+   6. Utilitários (Texto e Espaçamento)
+   ========================================================================== */
 
-/* * 1. VARIÁVEIS GLOBAIS
- * Para mudar o layout (cores, tamanhos) do site 
- * inteiro, edite apenas aqui.
- */
+/* --------------------------------------------------------------------------
+   1. Variáveis & Reset (Root)
+   -------------------------------------------------------------------------- */
+/* Centraliza as cores e dimensões do sistema.
+   Para alterar o tema do site, modifique apenas estas variáveis.
+*/
 :root {
-  --cor-principal: hsl(238, 82%, 15%);
-  --cor-fundo-pagina: #f0f0f0;
-  --cor-link-menu: #d1cece;
-  --cor-link-menu-hover: #fff;
+  --cor-principal: hsl(238, 82%, 15%); /* Azul Profundo (Brand Color) */
+  --cor-fundo-pagina: #f0f0f0; /* Cinza Claro (Background) */
+
+  --cor-link-menu: #d1cece; /* Texto Menu Inativo */
+  --cor-link-menu-hover: #fff; /* Texto Menu Ativo */
   --fundo-link-menu-hover: rgba(255, 255, 255, 0.1);
 
   --altura-header: 4.375rem; /* 70px */
@@ -19,8 +28,9 @@
   --largura-menu-min: 180px;
 }
 
-/* * 2. ESTILOS GERAIS (HTML, BODY)
- */
+/* --------------------------------------------------------------------------
+   2. Estrutura Base (HTML/Body)
+   -------------------------------------------------------------------------- */
 html,
 body {
   height: 100%;
@@ -32,8 +42,9 @@ body {
   font-size: 16px;
 }
 
-/* * 3. HEADER (CABEÇALHO)
- */
+/* --------------------------------------------------------------------------
+   3. Cabeçalho (Header)
+   -------------------------------------------------------------------------- */
 header {
   display: flex;
   justify-content: space-between;
@@ -42,17 +53,18 @@ header {
   padding: 0.625rem 1.25rem;
   height: var(--altura-header);
   z-index: 1000;
-  position: fixed;
+  position: fixed; /* Header fixo no topo */
   top: 0;
   left: 0;
   right: 0;
 }
 
 header img {
-  max-width: 5.625rem;
+  max-width: 5.625rem; /* 90px */
   height: auto;
 }
 
+/* Container do Menu de Usuário (Direita) */
 .menuHeader {
   display: flex;
   justify-content: flex-end;
@@ -60,12 +72,13 @@ header img {
   margin-top: 0.3125rem;
 }
 
-/* * 4. MENU LATERAL
- */
+/* --------------------------------------------------------------------------
+   4. Navegação Lateral (Sidebar/Aside)
+   -------------------------------------------------------------------------- */
 .menuLateral {
   background-color: var(--cor-principal);
   position: fixed;
-  top: var(--altura-header);
+  top: var(--altura-header); /* Começa logo abaixo do header */
   left: 0;
   height: calc(100vh - var(--altura-header));
   width: var(--largura-menu);
@@ -73,33 +86,33 @@ header img {
   z-index: 900;
 }
 
+/* Links do Menu */
 a.text-light {
-  color: var(--cor-link-menu);
+  color: var(--cor-link-menu) !important;
+  transition: color 0.2s ease;
 }
 
 a.text-light:hover {
-  color: var(--cor-link-menu-hover);
+  color: var(--cor-link-menu-hover) !important;
 }
 
 .hover-bg-light:hover {
   background-color: var(--fundo-link-menu-hover);
 }
 
-/* * 5. CLASSES DE LAYOUT DE CONTEÚDO
- * (Regras que empurram o conteúdo para 
- * depois do header e do menu)
- */
-
-/* Usado em: dashboard.html */
+/* --------------------------------------------------------------------------
+   5. Containers de Conteúdo
+   -------------------------------------------------------------------------- */
+/* Área principal onde as páginas são renderizadas */
 .content-area {
-  margin-top: var(--altura-header); /* Pula o header */
-  margin-left: var(--largura-menu); /* Pula o menu lateral */
+  margin-top: var(--altura-header);
+  margin-left: var(--largura-menu);
   padding: 2rem;
   width: calc(100% - var(--largura-menu));
   box-sizing: border-box;
 }
 
-/* Usado em: criar-processo.html, processos-do-setor.html */
+/* Cabeçalho de Página (Usado em criar-processo, processos-do-setor) */
 .titulo-descricao {
   width: 100%;
   max-width: 45rem;
@@ -108,30 +121,28 @@ a.text-light:hover {
   box-sizing: border-box;
 }
 
-/* Usado em: criar-processo.html, processos-do-setor.html */
+/* Container Fluido Customizado */
 .container-fluid {
   position: relative;
-  /* top: 1.25rem; (removido para simplificar) */
   padding: 1.25rem;
   box-sizing: border-box;
   z-index: 1;
   overflow-y: auto;
-  /* Ajuste para ocupar o espaço restante */
 }
 
-/* ================================================= */
-/* UTILITÁRIOS DE TEXTO (Truncamento)                */
-/* ================================================= */
-
+/* --------------------------------------------------------------------------
+   6. Utilitários (Texto e Espaçamento)
+   -------------------------------------------------------------------------- */
+/* Truncamento de texto com '...' */
 .text-limit {
-  white-space: nowrap; /* Impede quebra de linha */
-  overflow: hidden; /* Esconde o que passar do tamanho */
-  text-overflow: ellipsis; /* Adiciona "..." no final */
-  display: block; /* Garante que respeite a largura */
-  max-width: 200px; /* Largura padrão (pode ser sobrescrita) */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 200px;
 }
 
-/* Variações de largura para casos específicos */
+/* Larguras fixas auxiliares */
 .mw-100px {
   max-width: 100px;
 }

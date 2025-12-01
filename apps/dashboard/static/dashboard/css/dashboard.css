@@ -1,37 +1,43 @@
+/* ==========================================================================
+   DASHBOARD STYLESHEET
+   ==========================================================================
+   1. Variáveis & Reset
+   2. Layout Geral & Mensagens
+   3. Cards de KPI (Dashboard Cards)
+   4. Estilos dos Gráficos (Charts)
+   5. Tabelas & Listas
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   2. Layout Geral & Mensagens
+   -------------------------------------------------------------------------- */
+
 /* Mensagem de Boas-Vindas */
 .MensagemEntrada {
   padding: 0;
   font-size: 1.125rem;
-  margin-bottom: 1.5rem; /* Adiciona espaço abaixo da mensagem */
+  margin-bottom: 1.5rem; /* Espaçamento inferior */
+  color: #343a40;
 }
 
-/* Estilo base para TODOS os cards (incluindo o novo do gráfico) */
+/* --------------------------------------------------------------------------
+   3. Cards de KPI (Dashboard Cards)
+   -------------------------------------------------------------------------- */
+
+/* Estilo base para TODOS os cards de KPI */
 .dashboard-card {
-  width: 100%; /* Ocupa a coluna do Bootstrap */
-  padding: 1.25rem;
+  width: 100%;
+  padding: 1.25rem; /* 20px */
   font-size: 1.125rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); /* Sombra da imagem */
-  background-color: hsl(240, 6%, 88%); /* Cor de fundo original */
+  border-radius: 0.75rem; /* 12px */
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+  background-color: hsl(240, 6%, 88%); /* Fundo cinza padrão */
+  border: none;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Card do Gráfico (fundo branco) */
-.chart-card {
-  background-color: #ffffff;
-}
-
-/* Cores originais dos cards */
-.card1 {
-  color: var(--cor-principal); /* <-- Usando a variável global! */
-}
-.card2 {
-  color: #59570c;
-}
-.card3 {
-  color: #771313;
-}
-
-/* Estilos originais dos textos dos cards (Intactos) */
+/* Título do Card (Ex: "Processos Ativos") */
 .card-title {
   display: flex;
   align-items: center;
@@ -40,18 +46,20 @@
   font-weight: 500;
 }
 
+/* Valor Numérico do KPI */
 .card-text {
   font-size: 2.5rem;
   font-weight: bold;
   margin: 0.625rem 0;
 }
 
+/* Texto descritivo pequeno */
 .dashboard-card p {
   font-size: 1rem;
   margin: 0;
 }
 
-/* Icon Box (Círculo colorido no card) */
+/* Icon Box: Círculo com ícone dentro do card */
 .icon-box {
   width: 48px;
   height: 48px;
@@ -59,19 +67,46 @@
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5); /* Translúcido */
 }
 
-/* Card Hover Effect */
+/* Variações de Cores para os Cards de KPI */
+.card1 {
+  color: var(--cor-principal); /* Azul (definido no global) */
+}
+.card2 {
+  color: #59570c; /* Dourado escuro */
+}
+.card3 {
+  color: #771313; /* Vermelho escuro */
+}
+
+/* Efeito Hover Genérico para Cards */
 .card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Table Hover */
+/* --------------------------------------------------------------------------
+   4. Estilos dos Gráficos (Charts)
+   -------------------------------------------------------------------------- */
+
+/* Container do Gráfico (Fundo Branco para contraste) */
+.chart-card {
+  background-color: #ffffff;
+  /* Herda border-radius e shadow do .dashboard-card ou .card bootstrap */
+}
+
+/* --------------------------------------------------------------------------
+   5. Tabelas & Listas
+   -------------------------------------------------------------------------- */
+
 .table-hover tbody tr:hover {
   background-color: #f8f9fa;
+  cursor: default;
 }

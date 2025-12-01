@@ -3,21 +3,36 @@ from django.contrib.auth.models import AbstractUser
 
 
 class UsuarioCustomizado(AbstractUser):
-    # Definindo as opções de Função
+    """
+    Modelo de Usuário estendido (substitui o User padrão do Django).
+    Adiciona campos específicos para a regra de negócio da empresa (Função e Setor).
+    """
+
+    # Opções de função para controle de permissões no frontend/backend
     FUNCAO_CHOICES = [
         ('Gestor', 'Gestor'),
         ('Vendedor', 'Vendedor'),
         ('Separador', 'Separador'),
     ]
 
+    # Campos Personalizados
     funcao = models.CharField(
-        max_length=20, choices=FUNCAO_CHOICES, null=True, blank=True)  # type: ignore
+        max_length=20,
+        choices=FUNCAO_CHOICES,
+        null=True,
+        blank=True,
+        help_text="Define o nível de acesso do usuário no sistema."
+    )
 
-    setor = models.CharField(max_length=50, null=True,
-                             blank=True)  # type: ignore
+    setor = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True
+    )
 
-    # 'fotos_perfil/' é a pasta para onde as fotos irão
+    # Armazenamento de mídia: 'fotos_perfil/' será criado dentro da pasta MEDIA_ROOT
     foto = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)
 
     def __str__(self):
+        """Retorna o username como representação textual do objeto."""
         return self.username

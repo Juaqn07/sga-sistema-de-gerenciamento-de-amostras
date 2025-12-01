@@ -1,54 +1,106 @@
-body{
-    background-color: hsl(238, 82%, 15%);
-    margin: 0;
-    padding: 0;
-}
-header{
-    text-align: center;
-    color: #f0f0f0;
-    font-family: sans-serif;
+/* ==========================================================================
+   STYLESHEET: LOGIN
+   ==========================================================================
+   1. Layout Geral (Background & Body)
+   2. Cabeçalho (Header & Logo)
+   3. Container de Login (Card Central)
+   4. Elementos de Formulário (Inputs & Botões)
+   ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   1. Layout Geral
+   -------------------------------------------------------------------------- */
+body {
+  background-color: hsl(238, 82%, 15%); /* Azul escuro profundo */
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center; /* Centraliza verticalmente */
 }
-img{
-    max-width: 200px;
-    height: auto;
+
+/* --------------------------------------------------------------------------
+   2. Cabeçalho
+   -------------------------------------------------------------------------- */
+header {
+  text-align: center;
+  color: #f0f0f0;
+  margin-bottom: 2rem;
 }
-div {
-    background-color: #fffcfc;
-    border-radius: 10px;
-    width: 80%;          
-    max-width: 400px;    
-    height: auto;        
-    text-align: center;
-    margin: auto;
-    font-family: sans-serif;
-    padding: 1em;
+
+header img {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 1rem;
 }
-h1{
- font-size: 1.5rem;
- margin-bottom: 0.5em;
+
+/* --------------------------------------------------------------------------
+   3. Container de Login (Card Central)
+   -------------------------------------------------------------------------- */
+/* Seletor genérico 'div' substituído por classe específica ou mantido com cuidado */
+.login-container,
+div.login-wrapper {
+  /* Caso o HTML use div pura, considere adicionar uma classe */
+  background-color: #fffcfc;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 400px;
+  height: auto;
+  text-align: center;
+  margin: 0 auto; /* Centraliza horizontalmente */
+  padding: 2em;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5em;
+  color: #333;
+}
+
 h4 {
-    margin-top: 0.2em;
-    font-weight: normal;
-}   
-.container{
-    text-align: left;
+  margin-top: 0.2em;
+  font-weight: normal;
+  color: #666;
 }
+
+.container {
+  text-align: left; /* Alinha labels e inputs à esquerda */
+  padding: 0;
+}
+
+/* --------------------------------------------------------------------------
+   4. Elementos de Formulário
+   -------------------------------------------------------------------------- */
 input {
-    width: 100%;
-    max-width: 380px;
-    height: 30px;
-    padding: 5px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box; /* Garante que padding não estoure a largura */
+  height: 40px; /* Aumentado para melhor toque */
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+input:focus {
+  border-color: hsl(238, 82%, 30%);
+  outline: none;
 }
 
 input[type="submit"] {
-    background-color: hsl(238, 82%, 30%);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  background-color: hsl(238, 82%, 30%);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 10px;
+}
+
+input[type="submit"]:hover {
+  background-color: hsl(238, 82%, 40%);
 }
