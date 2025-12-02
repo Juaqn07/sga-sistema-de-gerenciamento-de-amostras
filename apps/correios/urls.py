@@ -11,4 +11,7 @@ urlpatterns = [
     path('api/consulta-cep/', views.api_consult_zipcode_view,
          name='api_consulta_cep'),
 
+    path('api/cotacao/<int:pk>/',
+         views.api_calculate_shipping_view, name='api_cotacao'),
+
 ]

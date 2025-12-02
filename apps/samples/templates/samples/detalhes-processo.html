@@ -321,6 +321,13 @@
                class="btn btn-warning text-dark w-100"> <i class="bi bi-arrow-repeat me-1"></i> Atualizar Rastreio
             </a>
           {% endif %}
+          {% if not processo.is_cancelado %}
+            <button class="btn btn-primary w-100 mt-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalCotacao">
+              <i class="bi bi-calculator"></i> Cotar Envio
+            </button>
+          {% endif %}
         </div>
       </div>
     </div>

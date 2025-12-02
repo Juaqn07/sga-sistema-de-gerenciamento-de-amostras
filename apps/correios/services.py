@@ -269,3 +269,52 @@ class CorreiosService:
         except Exception as error:
             logger.error(f"❌ Erro conexão Rastreio: {error}")
             return None
+
+    # MÉTODO 3: Cotação de Preço e Prazo
+    def calculate_prices(self, payload):
+        """
+        Consulta apenas PREÇO.
+        Endpoint: /preco/v1/nacional
+        Payload espera: { "idLote": "1", "parametrosProduto": [...] }
+        """
+        url = f"{self.base_url}/preco/v1/nacional"
+
+        try:
+            headers = self.get_headers()
+            response = requests.post(
+                url, json=payload, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                return response.json()
+
+            logger.error(
+                f"Erro API Preço: {response.status_code} - {response.text}")
+            return []
+
+        except Exception as e:
+            logger.error(f"Erro conexão Preço: {e}")
+            return []
+
+    def calculate_deadlines(self, payload):
+        """
+        Consulta apenas PRAZO.
+        Endpoint: /prazo/v1/nacional
+        Payload espera: { "idLote": "1", "parametrosPrazo": [...] }
+        """
+        url = f"{self.base_url}/prazo/v1/nacional"
+
+        try:
+            headers = self.get_headers()
+            response = requests.post(
+                url, json=payload, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                return response.json()
+
+            logger.error(
+                f"Erro API Prazo: {response.status_code} - {response.text}")
+            return []
+
+        except Exception as e:
+            logger.error(f"Erro conexão Prazo: {e}")
+            return []

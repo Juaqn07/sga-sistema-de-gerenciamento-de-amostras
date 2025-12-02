@@ -178,6 +178,8 @@ CORREIOS_CREDENTIALS = {
     'url_base': config('CORREIOS_URL_BASE', default='https://api.correios.com.br'),
 }
 
+CEP_ORIGEM_EMPRESA = config('CEP_ORIGEM_EMPRESA', default='00000000')
+
 # ==============================================================================
 # 10. CONFIGURAÇÕES DE PRODUÇÃO (HEROKU)
 # ==============================================================================

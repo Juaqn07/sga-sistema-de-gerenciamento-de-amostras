@@ -115,3 +115,82 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modalCotacao" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-box-seam me-2"></i>Cotação de Frete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCotacao">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Formato</label>
+                            <select class="form-select" name="formato" id="cotacaoFormato">
+                                <option value="1">Caixa / Pacote</option>
+                                <option value="2">Rolo / Prisma</option>
+                                <option value="3">Envelope</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Peso (gramas)</label>
+                            <input type="number"
+                                   class="form-control"
+                                   name="peso"
+                                   value="300"
+                                   id="cotacaoPeso">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Valor Declarado (R$)</label>
+                            <input type="number"
+                                   class="form-control"
+                                   name="valor"
+                                   value="0"
+                                   id="cotacaoValor">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Comprimento (cm)</label>
+                            <input type="number" class="form-control" name="comp" value="20">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Altura (cm)</label>
+                            <input type="number" class="form-control" name="alt" value="20">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Largura (cm)</label>
+                            <input type="number" class="form-control" name="larg" value="20">
+                        </div>
+                    </div>
+                    <div class="text-end mt-3">
+                        <button type="button" class="btn btn-success" id="btnRealizarCotacao">Calcular</button>
+                    </div>
+                </form>
+                <hr>
+                <div id="resultadoCotacao" class="mt-3 d-none">
+                    <h6>Opções de Envio:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Serviço</th>
+                                    <th>Prazo</th>
+                                    <th>Preço</th>
+                                    <th>Previsão</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaResultados">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="loadingCotacao" class="text-center py-3 d-none">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Consultando Correios...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
