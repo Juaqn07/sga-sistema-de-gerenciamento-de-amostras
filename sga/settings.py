@@ -177,3 +177,22 @@ CORREIOS_CREDENTIALS = {
     'cartao': config('CORREIOS_CARTAO', default=''),
     'url_base': config('CORREIOS_URL_BASE', default='https://api.correios.com.br'),
 }
+
+# ==============================================================================
+# 10. CONFIGURAÇÕES DE PRODUÇÃO (HEROKU)
+# ==============================================================================
+
+# Se estiver rodando no Heroku (identificado pela variável de ambiente do banco)
+if config('DATABASE_URL', default=None):
+    # 1. Configuração de Proxy (Essencial para HTTPS no Heroku)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # 2. Domínios Confiáveis para CSRF
+    # Permite que formulários venham do seu domínio no Heroku
+    CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
+
+    # 3. Estáticos (Compressão e Cache)
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
