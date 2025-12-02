@@ -1,24 +1,20 @@
 {% extends "core/base.html" %}
 {% load static %}
-
-{% block title %}Meu Perfil{% endblock title %}
-
+{% block title %}
+  Meu Perfil
+{% endblock title %}
 {% block page_css %}
   <link rel="stylesheet" href="{% static 'accounts/css/perfil.css' %}">
 {% endblock page_css %}
-
 {% block content %}
   <div class="mb-4">
     <h3>Meu Perfil</h3>
     <p>Gerencie suas informações pessoais e configurações</p>
   </div>
-
   <div class="row">
-    
     <div class="col-md-4 mb-4">
       <div class="card p-3">
         <div class="mb-3 text-center">
-          
           {% if user.foto %}
             <img src="{{ user.foto.url }}"
                  class="rounded-circle img-fluid"
@@ -26,15 +22,14 @@
                  width="150"
                  height="150" />
           {% else %}
-            <img src="https://via.placeholder.com/150"
+            <!--https://placeholderimage.dev/-->
+            <img src="data:image/png;base64,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"
                  class="rounded-circle img-fluid"
                  alt="Foto de perfil"
                  width="150"
                  height="150" />
           {% endif %}
-          
-          </div>
-        
+        </div>
         <div class="text-center">
           <h5>{{ user.get_full_name|default:user.username }}</h5>
           <p>{{ user.funcao|default:"N/A" }}</p>
@@ -43,53 +38,59 @@
         </div>
       </div>
     </div>
-
     <div class="col-md-8 mb-4">
       <div class="card p-3">
         <h5>Dados Pessoais</h5>
         <p>Atualize suas informações pessoais</p>
-        
         <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-
           <div class="mb-3">
             <label for="nomeCompleto" class="form-label">Nome Completo</label>
             <input type="text"
                    class="form-control"
                    id="nomeCompleto"
-                   name="nome_completo" value="{{ user.get_full_name }}" />
+                   name="nome_completo"
+                   value="{{ user.get_full_name }}" />
           </div>
-
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email"
                    class="form-control"
                    id="email"
-                   name="email" value="{{ user.email }}" />
+                   name="email"
+                   value="{{ user.email }}" />
           </div>
-
           <div class="mb-3">
             <label for="fotoPerfil" class="form-label">Alterar Foto de Perfil</label>
-            <input type="file"
-                   class="form-control"
-                   id="fotoPerfil"
-                   name="foto_perfil" /> </div>
-
+            <input type="file" class="form-control" id="fotoPerfil" name="foto_perfil" />
+            <form method="POST"
+                  onsubmit="return confirm('Tem certeza que deseja remover sua foto de perfil?');">
+              {% csrf_token %}
+              <input type="hidden" name="acao" value="remover_foto">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i> Remover
+              </button>
+            </form>
+          </div>
           <div class="mb-3">
             <label for="senha" class="form-label">Nova Senha</label>
-            <input type="password" class="form-control" id="senha" name="nova_senha" placeholder="Deixe em branco para não alterar" />
+            <input type="password"
+                   class="form-control"
+                   id="senha"
+                   name="nova_senha"
+                   placeholder="Deixe em branco para não alterar" />
           </div>
-
           <div class="mb-3">
             <label for="confirmSenha" class="form-label">Confirmação da Nova Senha</label>
-            <input type="password" class="form-control" id="confirmSenha" name="confirma_senha" />
+            <input type="password"
+                   class="form-control"
+                   id="confirmSenha"
+                   name="confirma_senha" />
           </div>
-
           <div class="mb-3">
             <label class="form-label">Função</label>
             <input type="text" class="form-control" value="{{ user.funcao }}" readonly />
           </div>
-          
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">Salvar</button>
             <button type="reset" class="btn btn-secondary">Cancelar</button>

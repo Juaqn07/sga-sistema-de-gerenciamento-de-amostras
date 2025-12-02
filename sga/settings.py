@@ -190,8 +190,13 @@ if config('DATABASE_URL', default=None):
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+    # --- HSTS (HTTP Strict Transport Security) ---
+    # Força navegadores a usarem HTTPS por 1 ano
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
     # 2. Domínios Confiáveis para CSRF
-    # Permite que formulários venham do seu domínio no Heroku
     CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
 
     # 3. Estáticos (Compressão e Cache)

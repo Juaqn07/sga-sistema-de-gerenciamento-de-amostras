@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from apps.core.validators import validar_tamanho_arquivo
 
 
 class UsuarioCustomizado(AbstractUser):
@@ -31,7 +32,12 @@ class UsuarioCustomizado(AbstractUser):
     )
 
     # Armazenamento de mídia: 'fotos_perfil/' será criado dentro da pasta MEDIA_ROOT
-    foto = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)
+    foto = models.ImageField(
+        upload_to='fotos_perfil/',
+        null=True,
+        blank=True,
+        validators=[validar_tamanho_arquivo]
+    )
 
     def __str__(self):
         """Retorna o username como representação textual do objeto."""

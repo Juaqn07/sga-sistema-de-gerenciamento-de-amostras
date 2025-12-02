@@ -3,6 +3,10 @@ from django.core.cache import cache
 import requests
 import base64
 from datetime import datetime, timedelta
+import logging
+
+# Configura o logger para este módulo
+logger = logging.getLogger(__name__)
 
 
 class CorreiosService:
@@ -109,7 +113,8 @@ class CorreiosService:
             # --- BLINDAGEM ---
             # Verifica se a resposta foi bem-sucedida (Status 200 OK ou 201 Created)
             if response.status_code not in [200, 201]:
-                print(f"❌ Erro HTTP na Autenticação: {response.status_code}")
+                logger.error(
+                    f"❌ Erro HTTP na Autenticação: {response.status_code}")
                 return None
             # -----------------
 
@@ -128,7 +133,7 @@ class CorreiosService:
             return self._token
 
         except Exception as error:
-            print(f"Erro de conexão durante autenticação: {error}")
+            logger.exception(f"Erro de conexão durante autenticação: {error}")
             return None
 
     def get_headers(self):
@@ -147,6 +152,8 @@ class CorreiosService:
 
         # Se ainda assim não houver token, lança exceção crítica
         if not self._token:
+            logger.critical(
+                "Falha crítica: Token dos Correios não pôde ser obtido.")
             raise Exception(
                 "Falha crítica: Não foi possível obter token de acesso dos Correios.")
 
@@ -201,16 +208,16 @@ class CorreiosService:
                     'complemento': address_data.get('complemento', ''),
                 }
             elif response.status_code == 404:
-                print(
+                logger.info(
                     f"CEP não encontrado na base Correios: {sanitized_zipcode}")
                 return None
             else:
-                print(
+                logger.error(
                     f"Erro API CEP Correios: {response.status_code} - {response.text}")
                 return None
 
         except Exception as error:
-            print(f"Erro de conexão (CEP): {error}")
+            logger.error(f"Erro de conexão (CEP): {error}")
             return None
 
     def track_object(self, tracking_code):
@@ -249,15 +256,16 @@ class CorreiosService:
 
                     # Verifica se a API retornou uma mensagem de erro lógica (ex: "Objeto não encontrado")
                     if 'mensagem' in object_info:
-                        print(f"⚠️ Aviso Correios: {object_info['mensagem']}")
+                        logger.warning(
+                            f"⚠️ Aviso Correios: {object_info['mensagem']}")
                         return None
 
                     return object_info
 
-            print(
+            logger.error(
                 f"⚠️ Erro API Rastreio: Status {response.status_code} - {response.text}")
             return None
 
         except Exception as error:
-            print(f"❌ Erro conexão Rastreio: {error}")
+            logger.error(f"❌ Erro conexão Rastreio: {error}")
             return None

@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from apps.core.validators import validar_tamanho_arquivo, validar_extensao_segura
 
 # ==============================================================================
 # 1. MODELOS AUXILIARES
@@ -210,7 +211,13 @@ class Anexo(models.Model):
     """Arquivos anexados ao processo (PDFs, Imagens, etc)."""
     processo = models.ForeignKey(
         Processo, on_delete=models.CASCADE, related_name='anexos')
-    arquivo = models.FileField(upload_to='anexos_processos/')
+
+    # Nova validação de upload
+    arquivo = models.FileField(
+        upload_to='anexos_processos/',
+        validators=[validar_tamanho_arquivo, validar_extensao_segura]
+    )
+
     data_upload = models.DateTimeField(auto_now_add=True)
 
     def nome_arquivo(self):

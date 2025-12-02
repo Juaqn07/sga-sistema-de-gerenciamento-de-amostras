@@ -40,12 +40,23 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
           }
 
-          // Renderiza lista de resultados
+          // Renderiza lista de resultados de forma SEGURA (Sem innerHTML)
           data.results.forEach((cliente) => {
             const item = document.createElement("a");
             item.className =
               "list-group-item list-group-item-action result-item";
-            item.innerHTML = `<strong>${cliente.nome}</strong> <small>(${cliente.cidade}/${cliente.estado})</small>`;
+
+            // Criação segura dos elementos de texto
+            const nomeStrong = document.createElement("strong");
+            nomeStrong.textContent = cliente.nome; // Sanitização automática
+
+            const localSmall = document.createElement("small");
+            // Adiciona espaço antes do parênteses para estética
+            localSmall.textContent = ` (${cliente.cidade}/${cliente.estado})`;
+
+            // Montagem do elemento
+            item.appendChild(nomeStrong);
+            item.appendChild(localSmall);
 
             // Ao clicar, seleciona o cliente e esconde a busca
             item.onclick = () => selecionarCliente(cliente);

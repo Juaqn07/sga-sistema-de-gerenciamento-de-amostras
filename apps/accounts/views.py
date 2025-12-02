@@ -68,41 +68,51 @@ def profile_view(request):
     user = request.user
 
     if request.method == 'POST':
-        # --- 1. Atualização de Dados Cadastrais ---
-        nome_completo = request.POST.get('nome_completo')
-        email = request.POST.get('email')
-
-        # Lógica para separar Nome e Sobrenome
-        if nome_completo:
-            partes_nome = nome_completo.split(' ', 1)
-            user.first_name = partes_nome[0]
-            user.last_name = partes_nome[1] if len(partes_nome) > 1 else ''
-
-        user.email = email
-
-        # --- 2. Upload de Foto ---
-        if 'foto_perfil' in request.FILES:
-            user.foto = request.FILES['foto_perfil']
-
-        # --- 3. Troca de Senha Manual ---
-        nova_senha = request.POST.get('nova_senha')
-        confirma_senha = request.POST.get('confirma_senha')
-
-        if nova_senha:
-            if nova_senha == confirma_senha:
-                # Aplica criptografia na nova senha
-                user.set_password(nova_senha)
+        acao = request.POST.get('acao')
+        if acao == 'remover_foto':
+            if user.foto:
+                user.foto.delete(save=False)  # Remove o arquivo físico
+                user.foto = None             # Limpa a referência no banco
+                user.save()
                 messages.success(
-                    request, 'Sua senha foi alterada com sucesso!')
+                    request, 'Foto de perfil removida com sucesso.')
+            return redirect('accounts:perfil')
+        else:
+            # --- 1. Atualização de Dados Cadastrais ---
+            nome_completo = request.POST.get('nome_completo')
+            email = request.POST.get('email')
 
-                # REQUISITO CRÍTICO: Atualizar hash da sessão
-                # Sem isso, o usuário seria deslogado automaticamente após mudar a senha
-                update_session_auth_hash(request, user)
-            else:
-                messages.error(request, 'As novas senhas não conferem.')
+            # Lógica para separar Nome e Sobrenome
+            if nome_completo:
+                partes_nome = nome_completo.split(' ', 1)
+                user.first_name = partes_nome[0]
+                user.last_name = partes_nome[1] if len(partes_nome) > 1 else ''
 
-        user.save()
-        return redirect('accounts:perfil')
+            user.email = email
+
+            # --- 2. Upload de Foto ---
+            if 'foto_perfil' in request.FILES:
+                user.foto = request.FILES['foto_perfil']
+
+            # --- 3. Troca de Senha Manual ---
+            nova_senha = request.POST.get('nova_senha')
+            confirma_senha = request.POST.get('confirma_senha')
+
+            if nova_senha:
+                if nova_senha == confirma_senha:
+                    # Aplica criptografia na nova senha
+                    user.set_password(nova_senha)
+                    messages.success(
+                        request, 'Sua senha foi alterada com sucesso!')
+
+                    # REQUISITO CRÍTICO: Atualizar hash da sessão
+                    # Sem isso, o usuário seria deslogado automaticamente após mudar a senha
+                    update_session_auth_hash(request, user)
+                else:
+                    messages.error(request, 'As novas senhas não conferem.')
+
+            user.save()
+            return redirect('accounts:perfil')
 
     return render(request, 'accounts/perfil.html')
 
