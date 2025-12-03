@@ -17,35 +17,30 @@ from django.contrib.messages import constants as messages
 # ==============================================================================
 # 1. CAMINHOS E DIRETÓRIOS BASE
 # ==============================================================================
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ==============================================================================
 # 2. SEGURANÇA E AMBIENTE
 # ==============================================================================
-# A SECRET_KEY deve ser mantida em segredo absoluto em produção
 SECRET_KEY = config(
     'SECRET_KEY',
     default='django-insecure-utzl+ul+!@2&z@tqg-^tp(a1$hc*xvgxol_&s@%knp$&9_y@*o'
 )
 
-# DEBUG deve ser False em produção para evitar vazamento de dados de erro
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# Lista de hosts/domínios que podem servir esta aplicação
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
     default='127.0.0.1,localhost',
-    cast=Csv()  # type: ignore
-)
+    cast=Csv()
+)  # type: ignore
 
 
 # ==============================================================================
 # 3. APLICAÇÕES INSTALADAS
 # ==============================================================================
 INSTALLED_APPS = [
-    # Apps Padrão do Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,28 +48,26 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Apps para armazenamento de imagens (cloudinary)
+    # Armazenamento de Mídia (Cloudinary) - Ordem Importa!
     'cloudinary_storage',
     'cloudinary',
 
     # Apps do Projeto (Local Apps)
-    'apps.core',        # Utilitários globais
-    'apps.accounts',    # Gestão de Usuários Customizados
-    'apps.dashboard',   # Visualização de Dados e KPIs
-    'apps.samples',     # Lógica de Negócio (Processos/Amostras)
-    'apps.correios',    # Integração API Correios
+    'apps.core',
+    'apps.accounts',
+    'apps.dashboard',
+    'apps.samples',
+    'apps.correios',
 ]
 
 
 # ==============================================================================
-# 4. MIDDLEWARE (Processamento de Requisições)
+# 4. MIDDLEWARE
 # ==============================================================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
-    # WhiteNoise: Permite servir arquivos estáticos de forma eficiente em produção
+    # Essencial para estáticos no Heroku
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -88,8 +81,8 @@ ROOT_URLCONF = 'sga.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Templates globais poderiam ser adicionados aqui
-        'APP_DIRS': True,  # Busca templates dentro das pastas dos apps
+        'DIRS': [],
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -105,9 +98,8 @@ WSGI_APPLICATION = 'sga.wsgi.application'
 
 
 # ==============================================================================
-# 5. BANCO DE DADOS
+# 5. BANCO DE DADOS (Híbrido: SQLite Local / Postgres Heroku)
 # ==============================================================================
-# Padrão: SQLite (Desenvolvimento). Em produção, recomenda-se PostgreSQL.
 DATABASES = {
     'default': config(
         'DATABASE_URL',
@@ -138,42 +130,52 @@ USE_TZ = True
 
 
 # ==============================================================================
-# 8. ARQUIVOS ESTÁTICOS E MÍDIA
+# 8. ARQUIVOS ESTÁTICOS E MÍDIA (Configuração Moderna - Django 5+)
 # ==============================================================================
-# Static files (CSS, JavaScript, Images)
+
+# URLs Base
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Configuração do WhiteNoise para compressão e cache de estáticos
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Media Files (Uploads de Usuários)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Configuração das Credenciais do Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+}
+
+# Definição dos Backends de Armazenamento (STORAGES)
+STORAGES = {
+    # 1. Arquivos de Mídia (Uploads) -> Vão para o Cloudinary
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    # 2. Arquivos Estáticos (CSS/JS do Sistema) -> Vão para o Whitenoise
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 
 # ==============================================================================
-# 9. CONFIGURAÇÕES CUSTOMIZADAS DO SISTEMA
+# 9. CONFIGURAÇÕES DO PROJETO
 # ==============================================================================
-
-# Definição de Chave Primária Padrão
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Modelo de Usuário Customizado (app accounts)
-# Substitui o User padrão do Django para permitir login com campos extras (Função/Setor)
 AUTH_USER_MODEL = 'accounts.UsuarioCustomizado'
 
-# Redirecionamentos de Autenticação
+# Login/Logout
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'dashboard:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
-# Integração com Mensagens do Bootstrap (Mapeamento de Tags)
+# Tags de Mensagem (Bootstrap)
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-# Credenciais da API dos Correios (Carregadas do .env via decouple)
+# Correios
 CORREIOS_CREDENTIALS = {
     'usuario': config('CORREIOS_USER', default=''),
     'senha': config('CORREIOS_CODIGO_ACESSO', default=''),
@@ -184,35 +186,18 @@ CORREIOS_CREDENTIALS = {
 
 CEP_ORIGEM_EMPRESA = config('CEP_ORIGEM_EMPRESA', default='00000000')
 
-# ==============================================================================
-# 10. CONFIGURAÇÕES DE PRODUÇÃO (HEROKU)
-# ==============================================================================
 
-# Se estiver rodando no Heroku (identificado pela variável de ambiente do banco)
+# ==============================================================================
+# 10. SEGURANÇA EM PRODUÇÃO (HEROKU)
+# ==============================================================================
 if config('DATABASE_URL', default=None):
-    # 1. Configuração de Proxy (Essencial para HTTPS no Heroku)
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-    # --- HSTS (HTTP Strict Transport Security) ---
-    # Força navegadores a usarem HTTPS por 1 ano
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-    # 2. Domínios Confiáveis para CSRF
     CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
-
-    # 3. Estáticos (Compressão e Cache)
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
-    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
-    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
-}
-
-# 3. Define que MÍDIA (Uploads) vai para o Cloudinary
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
