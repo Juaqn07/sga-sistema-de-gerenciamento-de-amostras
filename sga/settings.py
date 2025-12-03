@@ -53,6 +53,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Apps para armazenamento de imagens (cloudinary)
+    'cloudinary_storage',
+    'cloudinary',
+
     # Apps do Projeto (Local Apps)
     'apps.core',        # Utilitários globais
     'apps.accounts',    # Gestão de Usuários Customizados
@@ -137,7 +141,7 @@ USE_TZ = True
 # 8. ARQUIVOS ESTÁTICOS E MÍDIA
 # ==============================================================================
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Configuração do WhiteNoise para compressão e cache de estáticos
@@ -203,3 +207,12 @@ if config('DATABASE_URL', default=None):
 
     # 3. Estáticos (Compressão e Cache)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+}
+
+# 3. Define que MÍDIA (Uploads) vai para o Cloudinary
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
