@@ -14,13 +14,21 @@
   <div class="row">
     <div class="col-md-4 mb-4">
       <div class="card p-3">
-        <div class="mb-3 text-center">
+        <div class="d-grid gap-3 justify-content-center mb-3 text-center">
           {% if user.foto %}
             <img src="{{ user.foto.url }}"
                  class="rounded-circle img-fluid"
                  alt="Foto de perfil"
                  width="150"
                  height="150" />
+            <form method="POST"
+                  onsubmit="return confirm('Tem certeza que deseja remover sua foto de perfil?');">
+              {% csrf_token %}
+              <input type="hidden" name="acao" value="remover_foto">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i> Remover Foto
+              </button>
+            </form>
           {% else %}
             <!--https://placeholderimage.dev/-->
             <img src="data:image/png;base64,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"
@@ -63,14 +71,6 @@
           <div class="mb-3">
             <label for="fotoPerfil" class="form-label">Alterar Foto de Perfil</label>
             <input type="file" class="form-control" id="fotoPerfil" name="foto_perfil" />
-            <form method="POST"
-                  onsubmit="return confirm('Tem certeza que deseja remover sua foto de perfil?');">
-              {% csrf_token %}
-              <input type="hidden" name="acao" value="remover_foto">
-              <button type="submit" class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-trash"></i> Remover
-              </button>
-            </form>
           </div>
           <div class="mb-3">
             <label for="senha" class="form-label">Nova Senha</label>
